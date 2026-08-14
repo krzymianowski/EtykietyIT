@@ -9,7 +9,8 @@ namespace EtykietyIT.Forms;
 public partial class HistoryForm : Form
 {
     private readonly PrintHistoryService _printHistoryService;
-    private readonly IHistoryExporter _historyExporter;
+    private readonly IHistoryExporter _csvHistoryExporter;
+    private readonly IHistoryExporter _xlsxHistoryExporter;
     private IReadOnlyList<PrintHistoryEntry> _entries =
         Array.Empty<PrintHistoryEntry>();
     private IReadOnlyList<PrintHistoryEntry> _visibleEntries =
@@ -17,12 +18,15 @@ public partial class HistoryForm : Form
 
     public HistoryForm(
         PrintHistoryService printHistoryService,
-        IHistoryExporter historyExporter)
+        IHistoryExporter csvHistoryExporter,
+        IHistoryExporter xlsxHistoryExporter)
     {
         _printHistoryService = printHistoryService ??
             throw new ArgumentNullException(nameof(printHistoryService));
-        _historyExporter = historyExporter ??
-            throw new ArgumentNullException(nameof(historyExporter));
+        _csvHistoryExporter = csvHistoryExporter ??
+            throw new ArgumentNullException(nameof(csvHistoryExporter));
+        _xlsxHistoryExporter = xlsxHistoryExporter ??
+            throw new ArgumentNullException(nameof(xlsxHistoryExporter));
 
         InitializeComponent();
         InitializeGridColumns();
@@ -38,6 +42,7 @@ public partial class HistoryForm : Form
         dateToDateTimePicker.ValueChanged += FilterControl_Changed;
         historyDataGridView.SelectionChanged += HistoryDataGridView_SelectionChanged;
         exportCsvButton.Click += ExportCsvButton_Click;
+        exportXlsxButton.Click += ExportXlsxButton_Click;
         closeButton.Click += CloseButton_Click;
     }
 
@@ -158,7 +163,7 @@ public partial class HistoryForm : Form
         exportCsvButton.Enabled = false;
         try
         {
-            await _historyExporter.ExportAsync(
+            await _csvHistoryExporter.ExportAsync(
                 entriesToExport,
                 saveFileDialog.FileName);
             string fullPath = Path.GetFullPath(saveFileDialog.FileName);
@@ -182,6 +187,65 @@ public partial class HistoryForm : Form
         finally
         {
             exportCsvButton.Enabled = true;
+        }
+    }
+
+    private async void ExportXlsxButton_Click(object? sender, EventArgs e)
+    {
+        if (_visibleEntries.Count == 0)
+        {
+            MessageBox.Show(
+                this,
+                "Brak widocznych rekordów do wyeksportowania.",
+                "Eksport XLSX",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+            return;
+        }
+
+        PrintHistoryEntry[] entriesToExport = _visibleEntries.ToArray();
+        using var saveFileDialog = new SaveFileDialog
+        {
+            AddExtension = true,
+            DefaultExt = "xlsx",
+            FileName = $"EtykietyIT_Historia_{DateTime.Now:yyyy-MM-dd_HHmm}.xlsx",
+            Filter = "Skoroszyty programu Excel (*.xlsx)|*.xlsx",
+            OverwritePrompt = true,
+            Title = "Eksportuj historię do XLSX"
+        };
+
+        if (saveFileDialog.ShowDialog(this) != DialogResult.OK)
+        {
+            return;
+        }
+
+        exportXlsxButton.Enabled = false;
+        try
+        {
+            await _xlsxHistoryExporter.ExportAsync(
+                entriesToExport,
+                saveFileDialog.FileName);
+            string fullPath = Path.GetFullPath(saveFileDialog.FileName);
+
+            MessageBox.Show(
+                this,
+                $"Wyeksportowano rekordów: {entriesToExport.Length}\r\n\r\n{fullPath}",
+                "Eksport XLSX zakończony",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show(
+                this,
+                $"Nie udało się zapisać pliku XLSX.\r\n\r\n{exception.Message}",
+                "Błąd eksportu XLSX",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+        }
+        finally
+        {
+            exportXlsxButton.Enabled = true;
         }
     }
 

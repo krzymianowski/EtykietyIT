@@ -25,7 +25,9 @@ static class Program
                 services.PrinterCalibrationService,
                 services.LabelProfileService,
                 services.PrintHistoryService,
-                services.HistoryExporter,
+                services.ApplicationVersionService,
+                services.CsvHistoryExporter,
+                services.XlsxHistoryExporter,
                 settings));
         }
         catch (Exception exception)

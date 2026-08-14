@@ -43,7 +43,9 @@ public sealed class AppBootstrapper
             dataPaths.ProfilesDirectory);
         var printHistoryService = new PrintHistoryService(
             dataPaths.HistoryFilePath);
-        IHistoryExporter historyExporter = new CsvHistoryExporter();
+        var applicationVersionService = new ApplicationVersionService();
+        IHistoryExporter csvHistoryExporter = new CsvHistoryExporter();
+        IHistoryExporter xlsxHistoryExporter = new XlsxHistoryExporter();
 
         return new AppServices(
             mode,
@@ -54,7 +56,9 @@ public sealed class AppBootstrapper
             printerCalibrationService,
             labelProfileService,
             printHistoryService,
-            historyExporter);
+            applicationVersionService,
+            csvHistoryExporter,
+            xlsxHistoryExporter);
     }
 
     private static void CreateDataDirectories(AppDataPaths dataPaths)

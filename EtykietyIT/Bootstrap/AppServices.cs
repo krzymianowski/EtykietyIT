@@ -16,7 +16,9 @@ public sealed class AppServices
         PrinterCalibrationService printerCalibrationService,
         LabelProfileService labelProfileService,
         PrintHistoryService printHistoryService,
-        IHistoryExporter historyExporter)
+        ApplicationVersionService applicationVersionService,
+        IHistoryExporter csvHistoryExporter,
+        IHistoryExporter xlsxHistoryExporter)
     {
         ApplicationMode = applicationMode;
         DataPaths = dataPaths ?? throw new ArgumentNullException(nameof(dataPaths));
@@ -31,8 +33,12 @@ public sealed class AppServices
             throw new ArgumentNullException(nameof(labelProfileService));
         PrintHistoryService = printHistoryService ??
             throw new ArgumentNullException(nameof(printHistoryService));
-        HistoryExporter = historyExporter ??
-            throw new ArgumentNullException(nameof(historyExporter));
+        ApplicationVersionService = applicationVersionService ??
+            throw new ArgumentNullException(nameof(applicationVersionService));
+        CsvHistoryExporter = csvHistoryExporter ??
+            throw new ArgumentNullException(nameof(csvHistoryExporter));
+        XlsxHistoryExporter = xlsxHistoryExporter ??
+            throw new ArgumentNullException(nameof(xlsxHistoryExporter));
     }
 
     public ApplicationMode ApplicationMode { get; }
@@ -51,5 +57,9 @@ public sealed class AppServices
 
     public PrintHistoryService PrintHistoryService { get; }
 
-    public IHistoryExporter HistoryExporter { get; }
+    public ApplicationVersionService ApplicationVersionService { get; }
+
+    public IHistoryExporter CsvHistoryExporter { get; }
+
+    public IHistoryExporter XlsxHistoryExporter { get; }
 }

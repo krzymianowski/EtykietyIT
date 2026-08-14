@@ -141,3 +141,18 @@ zakresu i ilościach etykiet, a przed kolumną `Firma`.
 Dla wpisów utworzonych przed obsługą profili organizacji `ID organizacji`
 pozostaje puste, natomiast `Organizacja` ma wartość `—`. Rozszerzenie eksportu
 nie zmienia źródłowego formatu `print-history.jsonl` ani zapisanych wpisów.
+
+## Eksport XLSX historii
+
+Eksport XLSX zawiera arkusz `Historia wydruków` z tym samym zestawem i
+kolejnością kolumn co CSV. Daty są zapisywane jako wartości daty/czasu Excela,
+a numery, ilości, geometria i kalibracja jako wartości liczbowe. Identyfikatory,
+nazwy oraz wartości `Tak`/`Nie` pozostają tekstem.
+
+Pierwszy wiersz jest pogrubiony i zamrożony, a zakres danych ma włączony
+AutoFilter. Szerokości kolumn są jawnie ograniczone; dłuższe nazwy organizacji,
+firm, drukarek i profili mogą być zawijane. Stare wpisy historii zachowują pusty
+`ID organizacji` i wartość `—` w kolumnie `Organizacja`.
+
+Eksporty CSV i XLSX korzystają ze wspólnej definicji kolumn, ale nie zmieniają
+formatu ani zawartości źródłowego pliku `print-history.jsonl`.

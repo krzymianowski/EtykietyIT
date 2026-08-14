@@ -14,7 +14,9 @@ public partial class Form1 : Form
     private readonly PrinterCalibrationService _printerCalibrationService;
     private readonly LabelProfileService _labelProfileService;
     private readonly PrintHistoryService _printHistoryService;
-    private readonly IHistoryExporter _historyExporter;
+    private readonly ApplicationVersionService _applicationVersionService;
+    private readonly IHistoryExporter _csvHistoryExporter;
+    private readonly IHistoryExporter _xlsxHistoryExporter;
 
     private ApplicationSettings _settings;
     private OrganizationProfile? _activeOrganization;
@@ -29,7 +31,9 @@ public partial class Form1 : Form
         PrinterCalibrationService printerCalibrationService,
         LabelProfileService labelProfileService,
         PrintHistoryService printHistoryService,
-        IHistoryExporter historyExporter,
+        ApplicationVersionService applicationVersionService,
+        IHistoryExporter csvHistoryExporter,
+        IHistoryExporter xlsxHistoryExporter,
         ApplicationSettings settings)
     {
         _settingsService = settingsService ??
@@ -42,8 +46,12 @@ public partial class Form1 : Form
             throw new ArgumentNullException(nameof(labelProfileService));
         _printHistoryService = printHistoryService ??
             throw new ArgumentNullException(nameof(printHistoryService));
-        _historyExporter = historyExporter ??
-            throw new ArgumentNullException(nameof(historyExporter));
+        _applicationVersionService = applicationVersionService ??
+            throw new ArgumentNullException(nameof(applicationVersionService));
+        _csvHistoryExporter = csvHistoryExporter ??
+            throw new ArgumentNullException(nameof(csvHistoryExporter));
+        _xlsxHistoryExporter = xlsxHistoryExporter ??
+            throw new ArgumentNullException(nameof(xlsxHistoryExporter));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _settings.Validate();
 
@@ -312,7 +320,8 @@ public partial class Form1 : Form
     {
         using var historyForm = new HistoryForm(
             _printHistoryService,
-            _historyExporter);
+            _csvHistoryExporter,
+            _xlsxHistoryExporter);
         historyForm.ShowDialog(this);
     }
 
@@ -448,7 +457,7 @@ public partial class Form1 : Form
         {
             Id = Guid.NewGuid(),
             TimestampUtc = DateTimeOffset.UtcNow,
-            ApplicationVersion = Application.ProductVersion,
+            ApplicationVersion = _applicationVersionService.UserVersion,
             Snapshot = new PrintHistorySnapshot
             {
                 OrganizationProfileId = organization.Id,

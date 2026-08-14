@@ -29,6 +29,7 @@ partial class HistoryForm
         detailsGroupBox = new GroupBox();
         detailsTextBox = new TextBox();
         exportCsvButton = new Button();
+        exportXlsxButton = new Button();
         closeButton = new Button();
         ((System.ComponentModel.ISupportInitialize)historyDataGridView).BeginInit();
         detailsGroupBox.SuspendLayout();
@@ -146,12 +147,21 @@ partial class HistoryForm
         //
         // exportCsvButton
         //
-        exportCsvButton.Location = new Point(830, 616);
+        exportCsvButton.Location = new Point(20, 616);
         exportCsvButton.Name = "exportCsvButton";
         exportCsvButton.Size = new Size(150, 34);
         exportCsvButton.TabIndex = 10;
         exportCsvButton.Text = "Eksportuj CSV...";
         exportCsvButton.UseVisualStyleBackColor = true;
+        //
+        // exportXlsxButton
+        //
+        exportXlsxButton.Location = new Point(180, 616);
+        exportXlsxButton.Name = "exportXlsxButton";
+        exportXlsxButton.Size = new Size(150, 34);
+        exportXlsxButton.TabIndex = 11;
+        exportXlsxButton.Text = "Eksportuj XLSX...";
+        exportXlsxButton.UseVisualStyleBackColor = true;
         //
         // closeButton
         //
@@ -159,7 +169,7 @@ partial class HistoryForm
         closeButton.Location = new Point(1098, 616);
         closeButton.Name = "closeButton";
         closeButton.Size = new Size(92, 34);
-        closeButton.TabIndex = 11;
+        closeButton.TabIndex = 12;
         closeButton.Text = "Zamknij";
         closeButton.UseVisualStyleBackColor = true;
         //
@@ -168,6 +178,7 @@ partial class HistoryForm
         CancelButton = closeButton;
         ClientSize = new Size(1210, 670);
         Controls.Add(closeButton);
+        Controls.Add(exportXlsxButton);
         Controls.Add(exportCsvButton);
         Controls.Add(detailsGroupBox);
         Controls.Add(historyDataGridView);
@@ -205,5 +216,6 @@ partial class HistoryForm
     private GroupBox detailsGroupBox;
     private TextBox detailsTextBox;
     private Button exportCsvButton;
+    private Button exportXlsxButton;
     private Button closeButton;
 }
