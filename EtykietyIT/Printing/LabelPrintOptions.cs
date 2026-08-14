@@ -9,5 +9,6 @@ public sealed record LabelPrintOptions(
     int Columns,
     int Rows,
     bool DrawCutLines,
+    LabelContentOptions Content,
     PrinterCalibration? Calibration = null,
     LabelRenderMode RenderMode = LabelRenderMode.Print);

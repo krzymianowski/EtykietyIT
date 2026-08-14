@@ -1,4 +1,6 @@
 using System.Drawing.Printing;
+using EtykietyIT.Forms;
+using EtykietyIT.Models;
 using EtykietyIT.Printing;
 using EtykietyIT.Services;
 
@@ -12,25 +14,57 @@ public partial class Form1 : Form
     private const int LabelRows = 1;
     private const bool DrawCutLines = true;
 
-    public Form1()
+    private readonly SettingsService _settingsService;
+    private readonly PrinterCalibrationService _printerCalibrationService;
+
+    private ApplicationSettings _settings;
+
+    public Form1(
+        SettingsService settingsService,
+        PrinterCalibrationService printerCalibrationService,
+        ApplicationSettings settings)
     {
+        _settingsService = settingsService ??
+            throw new ArgumentNullException(nameof(settingsService));
+        _printerCalibrationService = printerCalibrationService ??
+            throw new ArgumentNullException(nameof(printerCalibrationService));
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        _settings.Validate();
+
         InitializeComponent();
 
         printerComboBox.SelectedIndexChanged += PrinterComboBox_SelectedIndexChanged;
         firstNumberNumericUpDown.ValueChanged += NumberInput_ValueChanged;
         quantityNumericUpDown.ValueChanged += NumberInput_ValueChanged;
+        settingsButton.Click += SettingsButton_Click;
+        saveCalibrationButton.Click += SaveCalibrationButton_Click;
         previewButton.Click += PreviewButton_Click;
         printButton.Click += PrintButton_Click;
 
+        firstNumberNumericUpDown.Value = _settings.NextAssetNumber;
         LoadInstalledPrinters();
         UpdateAssetRange();
     }
 
     private void LoadInstalledPrinters()
     {
+        printerComboBox.Items.Clear();
         foreach (string printerName in PrinterSettings.InstalledPrinters)
         {
             printerComboBox.Items.Add(printerName);
+        }
+
+        SelectPreferredPrinter(_settings.DefaultPrinterName);
+        UpdatePrintButtons();
+    }
+
+    private void SelectPreferredPrinter(string? preferredPrinterName)
+    {
+        int preferredIndex = FindPrinterIndex(preferredPrinterName);
+        if (preferredIndex >= 0)
+        {
+            printerComboBox.SelectedIndex = preferredIndex;
+            return;
         }
 
         int dymoIndex = -1;
@@ -48,18 +82,98 @@ public partial class Form1 : Form
         {
             printerComboBox.SelectedIndex = dymoIndex >= 0 ? dymoIndex : 0;
         }
-
-        UpdatePrintButtons();
+        else
+        {
+            SetCalibrationControls(new PrinterCalibration());
+        }
     }
 
-    private void PrinterComboBox_SelectedIndexChanged(object? sender, EventArgs e)
+    private int FindPrinterIndex(string? printerName)
+    {
+        if (string.IsNullOrWhiteSpace(printerName))
+        {
+            return -1;
+        }
+
+        for (int index = 0; index < printerComboBox.Items.Count; index++)
+        {
+            if (printerComboBox.Items[index] is string installedPrinterName &&
+                string.Equals(
+                    installedPrinterName,
+                    printerName,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return index;
+            }
+        }
+
+        return -1;
+    }
+
+    private async void PrinterComboBox_SelectedIndexChanged(
+        object? sender,
+        EventArgs e)
     {
         UpdatePrintButtons();
+        await LoadCalibrationForSelectedPrinterAsync();
     }
 
     private void NumberInput_ValueChanged(object? sender, EventArgs e)
     {
         UpdateAssetRange();
+    }
+
+    private async void SettingsButton_Click(object? sender, EventArgs e)
+    {
+        string[] installedPrinters = printerComboBox.Items
+            .Cast<string>()
+            .ToArray();
+
+        using var settingsForm = new SettingsForm(_settings, installedPrinters);
+        if (settingsForm.ShowDialog(this) != DialogResult.OK)
+        {
+            return;
+        }
+
+        try
+        {
+            await _settingsService.SaveAsync(settingsForm.Settings);
+            _settings = settingsForm.Settings;
+            UpdateAssetRange();
+            SelectPreferredPrinter(_settings.DefaultPrinterName);
+        }
+        catch (Exception exception)
+        {
+            ShowError($"Nie udało się zapisać ustawień.\r\n\r\n{exception.Message}");
+        }
+    }
+
+    private async void SaveCalibrationButton_Click(object? sender, EventArgs e)
+    {
+        string? printerName = GetSelectedPrinterName();
+        if (printerName is null)
+        {
+            ShowError("Wybierz drukarkę.");
+            return;
+        }
+
+        try
+        {
+            await _printerCalibrationService.SaveCalibrationAsync(
+                printerName,
+                GetPrinterCalibration());
+
+            MessageBox.Show(
+                this,
+                $"Zapisano kalibrację drukarki:\r\n{printerName}",
+                "Kalibracja drukarki",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+        catch (Exception exception)
+        {
+            ShowError($"Nie udało się zapisać kalibracji.\r\n\r\n{exception.Message}");
+        }
     }
 
     private void PreviewButton_Click(object? sender, EventArgs e)
@@ -99,7 +213,7 @@ public partial class Form1 : Form
         }
     }
 
-    private void PrintButton_Click(object? sender, EventArgs e)
+    private async void PrintButton_Click(object? sender, EventArgs e)
     {
         string? printerName = GetSelectedPrinterName();
         if (printerName is null)
@@ -118,8 +232,7 @@ public partial class Form1 : Form
 
         string confirmation =
             $"Drukarka: {printerName}\r\n" +
-            $"Zakres: {AssetIdFormatter.Format(startNumber)} – " +
-            $"{AssetIdFormatter.Format(endNumber)}\r\n" +
+            $"Zakres: {FormatAssetId(startNumber)} – {FormatAssetId(endNumber)}\r\n" +
             $"Małych etykiet: {quantity}\r\n" +
             $"Fizycznych etykiet: {physicalLabels}\r\n\r\n" +
             "Wysłać do drukarki?";
@@ -145,22 +258,40 @@ public partial class Form1 : Form
                 calibration,
                 LabelRenderMode.Print);
             printJob.Document.Print();
-
-            firstNumberNumericUpDown.Value = endNumber + 1;
         }
         catch (Exception exception)
         {
             ShowError($"Nie udało się wydrukować etykiet.\r\n\r\n{exception.Message}");
+            return;
+        }
+
+        int nextAssetNumber = endNumber + 1;
+        _settings = _settings with { NextAssetNumber = nextAssetNumber };
+        firstNumberNumericUpDown.Value = nextAssetNumber;
+
+        try
+        {
+            await _settingsService.SaveAsync(_settings);
+        }
+        catch (Exception exception)
+        {
+            ShowError(
+                "Zadanie zostało przekazane do systemu drukowania, ale nie udało się " +
+                $"zapisać następnego numeru.\r\n\r\n{exception.Message}");
         }
     }
 
-    private static LabelPrintJob CreatePrintJob(
+    private LabelPrintJob CreatePrintJob(
         string printerName,
         int startNumber,
         int quantity,
         PrinterCalibration calibration,
         LabelRenderMode renderMode)
     {
+        var content = new LabelContentOptions(
+            _settings.CompanyName,
+            _settings.AssetId.Prefix,
+            _settings.AssetId.Digits);
         var options = new LabelPrintOptions(
             printerName,
             startNumber,
@@ -170,10 +301,45 @@ public partial class Form1 : Form
             LabelColumns,
             LabelRows,
             DrawCutLines,
+            content,
             calibration,
             renderMode);
 
         return new LabelPrintJob(options);
+    }
+
+    private async Task LoadCalibrationForSelectedPrinterAsync()
+    {
+        string? printerName = GetSelectedPrinterName();
+        if (printerName is null)
+        {
+            SetCalibrationControls(new PrinterCalibration());
+            return;
+        }
+
+        try
+        {
+            PrinterCalibration calibration =
+                await _printerCalibrationService.GetCalibrationAsync(printerName);
+
+            if (string.Equals(
+                GetSelectedPrinterName(),
+                printerName,
+                StringComparison.OrdinalIgnoreCase))
+            {
+                SetCalibrationControls(calibration);
+            }
+        }
+        catch (Exception exception)
+        {
+            ShowError($"Nie udało się odczytać kalibracji.\r\n\r\n{exception.Message}");
+        }
+    }
+
+    private void SetCalibrationControls(PrinterCalibration calibration)
+    {
+        calibrationXNumericUpDown.Value = (decimal)calibration.OffsetXmm;
+        calibrationYNumericUpDown.Value = (decimal)calibration.OffsetYmm;
     }
 
     private PrinterCalibration GetPrinterCalibration()
@@ -188,6 +354,14 @@ public partial class Form1 : Form
         return printerComboBox.SelectedItem as string;
     }
 
+    private string FormatAssetId(int number)
+    {
+        return AssetIdFormatter.Format(
+            number,
+            _settings.AssetId.Prefix,
+            _settings.AssetId.Digits);
+    }
+
     private void UpdateAssetRange()
     {
         int startNumber = decimal.ToInt32(firstNumberNumericUpDown.Value);
@@ -195,8 +369,7 @@ public partial class Form1 : Form
         int endNumber = startNumber + quantity - 1;
 
         assetRangeLabel.Text =
-            $"{AssetIdFormatter.Format(startNumber)} – " +
-            AssetIdFormatter.Format(endNumber);
+            $"{FormatAssetId(startNumber)} – {FormatAssetId(endNumber)}";
     }
 
     private void UpdatePrintButtons()
@@ -204,6 +377,9 @@ public partial class Form1 : Form
         bool hasSelectedPrinter = GetSelectedPrinterName() is not null;
         previewButton.Enabled = hasSelectedPrinter;
         printButton.Enabled = hasSelectedPrinter;
+        saveCalibrationButton.Enabled = hasSelectedPrinter;
+        calibrationXNumericUpDown.Enabled = hasSelectedPrinter;
+        calibrationYNumericUpDown.Enabled = hasSelectedPrinter;
     }
 
     private void ShowError(string message)

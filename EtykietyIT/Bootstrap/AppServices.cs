@@ -1,5 +1,6 @@
 using EtykietyIT.Models;
 using EtykietyIT.Persistence;
+using EtykietyIT.Services;
 
 namespace EtykietyIT.Bootstrap;
 
@@ -8,11 +9,17 @@ public sealed class AppServices
     public AppServices(
         ApplicationMode applicationMode,
         AppDataPaths dataPaths,
-        JsonFileStore jsonFileStore)
+        JsonFileStore jsonFileStore,
+        SettingsService settingsService,
+        PrinterCalibrationService printerCalibrationService)
     {
         ApplicationMode = applicationMode;
         DataPaths = dataPaths ?? throw new ArgumentNullException(nameof(dataPaths));
         JsonFileStore = jsonFileStore ?? throw new ArgumentNullException(nameof(jsonFileStore));
+        SettingsService = settingsService ??
+            throw new ArgumentNullException(nameof(settingsService));
+        PrinterCalibrationService = printerCalibrationService ??
+            throw new ArgumentNullException(nameof(printerCalibrationService));
     }
 
     public ApplicationMode ApplicationMode { get; }
@@ -20,4 +27,8 @@ public sealed class AppServices
     public AppDataPaths DataPaths { get; }
 
     public JsonFileStore JsonFileStore { get; }
+
+    public SettingsService SettingsService { get; }
+
+    public PrinterCalibrationService PrinterCalibrationService { get; }
 }

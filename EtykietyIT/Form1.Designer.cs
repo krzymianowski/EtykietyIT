@@ -41,6 +41,8 @@ partial class Form1
         calibrationXNumericUpDown = new NumericUpDown();
         calibrationYPromptLabel = new Label();
         calibrationYNumericUpDown = new NumericUpDown();
+        saveCalibrationButton = new Button();
+        settingsButton = new Button();
         previewButton = new Button();
         printButton = new Button();
         ((System.ComponentModel.ISupportInitialize)firstNumberNumericUpDown).BeginInit();
@@ -80,7 +82,7 @@ partial class Form1
         //
         firstNumberNumericUpDown.Font = new Font("Consolas", 9F);
         firstNumberNumericUpDown.Location = new Point(145, 68);
-        firstNumberNumericUpDown.Maximum = new decimal(new int[] { 999999, 0, 0, 0 });
+        firstNumberNumericUpDown.Maximum = new decimal(new int[] { 2147482647, 0, 0, 0 });
         firstNumberNumericUpDown.Name = "firstNumberNumericUpDown";
         firstNumberNumericUpDown.Size = new Size(130, 22);
         firstNumberNumericUpDown.TabIndex = 3;
@@ -122,7 +124,7 @@ partial class Form1
         assetRangeLabel.Name = "assetRangeLabel";
         assetRangeLabel.Size = new Size(176, 17);
         assetRangeLabel.TabIndex = 7;
-        assetRangeLabel.Text = "IT-000011 – IT-000012";
+        assetRangeLabel.Text = "—";
         //
         // calibrationXPromptLabel
         //
@@ -164,12 +166,30 @@ partial class Form1
         calibrationYNumericUpDown.Size = new Size(130, 23);
         calibrationYNumericUpDown.TabIndex = 11;
         //
+        // saveCalibrationButton
+        //
+        saveCalibrationButton.Location = new Point(287, 223);
+        saveCalibrationButton.Name = "saveCalibrationButton";
+        saveCalibrationButton.Size = new Size(203, 34);
+        saveCalibrationButton.TabIndex = 12;
+        saveCalibrationButton.Text = "Zapisz kalibrację";
+        saveCalibrationButton.UseVisualStyleBackColor = true;
+        //
+        // settingsButton
+        //
+        settingsButton.Location = new Point(24, 282);
+        settingsButton.Name = "settingsButton";
+        settingsButton.Size = new Size(110, 34);
+        settingsButton.TabIndex = 13;
+        settingsButton.Text = "Ustawienia";
+        settingsButton.UseVisualStyleBackColor = true;
+        //
         // previewButton
         //
         previewButton.Location = new Point(287, 282);
         previewButton.Name = "previewButton";
         previewButton.Size = new Size(95, 34);
-        previewButton.TabIndex = 12;
+        previewButton.TabIndex = 14;
         previewButton.Text = "Podgląd";
         previewButton.UseVisualStyleBackColor = true;
         //
@@ -178,7 +198,7 @@ partial class Form1
         printButton.Location = new Point(395, 282);
         printButton.Name = "printButton";
         printButton.Size = new Size(95, 34);
-        printButton.TabIndex = 13;
+        printButton.TabIndex = 15;
         printButton.Text = "Drukuj";
         printButton.UseVisualStyleBackColor = true;
         //
@@ -188,6 +208,8 @@ partial class Form1
         ClientSize = new Size(519, 340);
         Controls.Add(printButton);
         Controls.Add(previewButton);
+        Controls.Add(settingsButton);
+        Controls.Add(saveCalibrationButton);
         Controls.Add(calibrationYNumericUpDown);
         Controls.Add(calibrationYPromptLabel);
         Controls.Add(calibrationXNumericUpDown);
@@ -227,6 +249,8 @@ partial class Form1
     private NumericUpDown calibrationXNumericUpDown;
     private Label calibrationYPromptLabel;
     private NumericUpDown calibrationYNumericUpDown;
+    private Button saveCalibrationButton;
+    private Button settingsButton;
     private Button previewButton;
     private Button printButton;
 }

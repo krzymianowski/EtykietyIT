@@ -1,5 +1,6 @@
 using EtykietyIT.Models;
 using EtykietyIT.Persistence;
+using EtykietyIT.Services;
 
 namespace EtykietyIT.Bootstrap;
 
@@ -24,8 +25,19 @@ public sealed class AppBootstrapper
         EnsureDataDirectoryIsWritable(dataPaths.RootDirectory, mode);
 
         var jsonFileStore = new JsonFileStore();
+        var settingsService = new SettingsService(
+            jsonFileStore,
+            dataPaths.SettingsFilePath);
+        var printerCalibrationService = new PrinterCalibrationService(
+            jsonFileStore,
+            dataPaths.PrinterCalibrationsFilePath);
 
-        return new AppServices(mode, dataPaths, jsonFileStore);
+        return new AppServices(
+            mode,
+            dataPaths,
+            jsonFileStore,
+            settingsService,
+            printerCalibrationService);
     }
 
     private static void CreateDataDirectories(AppDataPaths dataPaths)

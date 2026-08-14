@@ -32,6 +32,24 @@ Plik `settings.json` zawiera jeden `ApplicationSettings`.
 Docelowy plik `printer-calibrations.json` będzie zawierał kolekcję wpisów
 `PrinterCalibrationEntry`. Brak wpisu dla drukarki oznacza offset 0,0 / 0,0.
 
+```json
+{
+  "schemaVersion": 1,
+  "printers": [
+    {
+      "printerName": "DYMO LabelWriter 450",
+      "offsetXmm": 0.0,
+      "offsetYmm": 0.0
+    },
+    {
+      "printerName": "DYMO LabelWriter 550",
+      "offsetXmm": -0.4,
+      "offsetYmm": 0.0
+    }
+  ]
+}
+```
+
 Nazwa drukarki jest kluczem logicznym porównywanym bez rozróżniania wielkości
 liter. Nie należy automatycznie przypisywać kalibracji na podstawie samego modelu
 drukarki.

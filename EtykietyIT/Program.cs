@@ -1,16 +1,36 @@
+using EtykietyIT.Bootstrap;
+using EtykietyIT.Models;
+
 namespace EtykietyIT;
 
 static class Program
 {
-    /// <summary>
-    ///  The main entry point for the application.
-    /// </summary>
     [STAThread]
-    static void Main()
+    static void Main(string[] arguments)
     {
-        // To customize application configuration such as set high DPI settings or default font,
-        // see https://aka.ms/applicationconfiguration.
         ApplicationConfiguration.Initialize();
-        Application.Run(new Form1());
-    }    
+
+        try
+        {
+            var bootstrapper = new AppBootstrapper();
+            AppServices services = bootstrapper.Build(arguments);
+            ApplicationSettings settings = services.SettingsService
+                .LoadAsync()
+                .GetAwaiter()
+                .GetResult();
+
+            Application.Run(new Form1(
+                services.SettingsService,
+                services.PrinterCalibrationService,
+                settings));
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show(
+                $"Nie można uruchomić aplikacji.\r\n\r\n{exception.Message}",
+                "Etykiety IT",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+        }
+    }
 }

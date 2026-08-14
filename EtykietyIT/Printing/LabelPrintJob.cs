@@ -7,7 +7,6 @@ namespace EtykietyIT.Printing;
 
 public sealed class LabelPrintJob : IDisposable
 {
-    private const string Company = "Dolnośląskie Młyny S.A.";
     private const int PaperSizeTolerance = 8;
     private const float HundredthsInchToMillimeters = 0.254f;
 
@@ -81,6 +80,9 @@ public sealed class LabelPrintJob : IDisposable
 
     private static void ValidateOptions(LabelPrintOptions options)
     {
+        ArgumentNullException.ThrowIfNull(options.Content);
+        options.Content.Validate();
+
         bool printerInstalled = PrinterSettings.InstalledPrinters
             .Cast<string>()
             .Any(printerName => string.Equals(
@@ -296,7 +298,10 @@ public sealed class LabelPrintJob : IDisposable
             }
 
             int number = _options.StartNumber + _index;
-            string assetId = AssetIdFormatter.Format(number);
+            string assetId = AssetIdFormatter.Format(
+                number,
+                _options.Content.AssetIdPrefix,
+                _options.Content.AssetIdDigits);
 
             float titleY = layoutY0 + layoutHeight * 0.07f;
             float titleHeight = Math.Max(3.0f, layoutHeight * 0.14f);
@@ -349,7 +354,7 @@ public sealed class LabelPrintJob : IDisposable
                 6.0f);
             Font companyFont = CreateFittingFont(
                 graphics,
-                Company,
+                _options.Content.CompanyName,
                 barRect,
                 "Arial",
                 FontStyle.Bold,
@@ -374,7 +379,7 @@ public sealed class LabelPrintJob : IDisposable
 
                 graphics.FillRectangle(Brushes.Black, barRect);
                 graphics.DrawString(
-                    Company,
+                    _options.Content.CompanyName,
                     companyFont,
                     Brushes.White,
                     barRect,
