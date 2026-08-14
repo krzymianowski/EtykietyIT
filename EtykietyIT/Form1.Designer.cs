@@ -31,6 +31,9 @@ partial class Form1
         components = new System.ComponentModel.Container();
         printerPromptLabel = new Label();
         printerComboBox = new ComboBox();
+        profilePromptLabel = new Label();
+        profileComboBox = new ComboBox();
+        profilesButton = new Button();
         firstNumberPromptLabel = new Label();
         firstNumberNumericUpDown = new NumericUpDown();
         quantityPromptLabel = new Label();
@@ -69,145 +72,173 @@ partial class Form1
         printerComboBox.Size = new Size(345, 23);
         printerComboBox.TabIndex = 1;
         //
+        // profilePromptLabel
+        //
+        profilePromptLabel.AutoSize = true;
+        profilePromptLabel.Location = new Point(24, 66);
+        profilePromptLabel.Name = "profilePromptLabel";
+        profilePromptLabel.Size = new Size(38, 15);
+        profilePromptLabel.TabIndex = 2;
+        profilePromptLabel.Text = "Profil:";
+        //
+        // profileComboBox
+        //
+        profileComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+        profileComboBox.FormattingEnabled = true;
+        profileComboBox.Location = new Point(145, 63);
+        profileComboBox.Name = "profileComboBox";
+        profileComboBox.Size = new Size(245, 23);
+        profileComboBox.TabIndex = 3;
+        //
+        // profilesButton
+        //
+        profilesButton.Location = new Point(398, 60);
+        profilesButton.Name = "profilesButton";
+        profilesButton.Size = new Size(92, 29);
+        profilesButton.TabIndex = 4;
+        profilesButton.Text = "Profile...";
+        profilesButton.UseVisualStyleBackColor = true;
+        //
         // firstNumberPromptLabel
         //
         firstNumberPromptLabel.AutoSize = true;
-        firstNumberPromptLabel.Location = new Point(24, 72);
+        firstNumberPromptLabel.Location = new Point(24, 111);
         firstNumberPromptLabel.Name = "firstNumberPromptLabel";
         firstNumberPromptLabel.Size = new Size(88, 15);
-        firstNumberPromptLabel.TabIndex = 2;
+        firstNumberPromptLabel.TabIndex = 5;
         firstNumberPromptLabel.Text = "Pierwszy numer:";
         //
         // firstNumberNumericUpDown
         //
         firstNumberNumericUpDown.Font = new Font("Consolas", 9F);
-        firstNumberNumericUpDown.Location = new Point(145, 68);
+        firstNumberNumericUpDown.Location = new Point(145, 107);
         firstNumberNumericUpDown.Maximum = new decimal(new int[] { 2147482647, 0, 0, 0 });
         firstNumberNumericUpDown.Name = "firstNumberNumericUpDown";
         firstNumberNumericUpDown.Size = new Size(130, 22);
-        firstNumberNumericUpDown.TabIndex = 3;
+        firstNumberNumericUpDown.TabIndex = 6;
         firstNumberNumericUpDown.Value = new decimal(new int[] { 11, 0, 0, 0 });
         //
         // quantityPromptLabel
         //
         quantityPromptLabel.AutoSize = true;
-        quantityPromptLabel.Location = new Point(24, 111);
+        quantityPromptLabel.Location = new Point(24, 150);
         quantityPromptLabel.Name = "quantityPromptLabel";
         quantityPromptLabel.Size = new Size(115, 15);
-        quantityPromptLabel.TabIndex = 4;
+        quantityPromptLabel.TabIndex = 7;
         quantityPromptLabel.Text = "Liczba małych etykiet:";
         //
         // quantityNumericUpDown
         //
-        quantityNumericUpDown.Location = new Point(145, 107);
+        quantityNumericUpDown.Location = new Point(145, 146);
         quantityNumericUpDown.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
         quantityNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
         quantityNumericUpDown.Name = "quantityNumericUpDown";
         quantityNumericUpDown.Size = new Size(130, 23);
-        quantityNumericUpDown.TabIndex = 5;
+        quantityNumericUpDown.TabIndex = 8;
         quantityNumericUpDown.Value = new decimal(new int[] { 2, 0, 0, 0 });
         //
         // assetRangePromptLabel
         //
         assetRangePromptLabel.AutoSize = true;
-        assetRangePromptLabel.Location = new Point(24, 154);
+        assetRangePromptLabel.Location = new Point(24, 193);
         assetRangePromptLabel.Name = "assetRangePromptLabel";
         assetRangePromptLabel.Size = new Size(44, 15);
-        assetRangePromptLabel.TabIndex = 6;
+        assetRangePromptLabel.TabIndex = 9;
         assetRangePromptLabel.Text = "Zakres:";
         //
         // assetRangeLabel
         //
         assetRangeLabel.AutoSize = true;
         assetRangeLabel.Font = new Font("Consolas", 10.5F, FontStyle.Bold);
-        assetRangeLabel.Location = new Point(145, 152);
+        assetRangeLabel.Location = new Point(145, 191);
         assetRangeLabel.Name = "assetRangeLabel";
         assetRangeLabel.Size = new Size(176, 17);
-        assetRangeLabel.TabIndex = 7;
+        assetRangeLabel.TabIndex = 10;
         assetRangeLabel.Text = "—";
         //
         // calibrationXPromptLabel
         //
         calibrationXPromptLabel.AutoSize = true;
-        calibrationXPromptLabel.Location = new Point(24, 199);
+        calibrationXPromptLabel.Location = new Point(24, 238);
         calibrationXPromptLabel.Name = "calibrationXPromptLabel";
         calibrationXPromptLabel.Size = new Size(92, 15);
-        calibrationXPromptLabel.TabIndex = 8;
+        calibrationXPromptLabel.TabIndex = 11;
         calibrationXPromptLabel.Text = "Korekta X [mm]:";
         //
         // calibrationXNumericUpDown
         //
         calibrationXNumericUpDown.DecimalPlaces = 1;
         calibrationXNumericUpDown.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
-        calibrationXNumericUpDown.Location = new Point(145, 195);
+        calibrationXNumericUpDown.Location = new Point(145, 234);
         calibrationXNumericUpDown.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
         calibrationXNumericUpDown.Minimum = new decimal(new int[] { 10, 0, 0, int.MinValue });
         calibrationXNumericUpDown.Name = "calibrationXNumericUpDown";
         calibrationXNumericUpDown.Size = new Size(130, 23);
-        calibrationXNumericUpDown.TabIndex = 9;
+        calibrationXNumericUpDown.TabIndex = 12;
         //
         // calibrationYPromptLabel
         //
         calibrationYPromptLabel.AutoSize = true;
-        calibrationYPromptLabel.Location = new Point(24, 238);
+        calibrationYPromptLabel.Location = new Point(24, 277);
         calibrationYPromptLabel.Name = "calibrationYPromptLabel";
         calibrationYPromptLabel.Size = new Size(92, 15);
-        calibrationYPromptLabel.TabIndex = 10;
+        calibrationYPromptLabel.TabIndex = 13;
         calibrationYPromptLabel.Text = "Korekta Y [mm]:";
         //
         // calibrationYNumericUpDown
         //
         calibrationYNumericUpDown.DecimalPlaces = 1;
         calibrationYNumericUpDown.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
-        calibrationYNumericUpDown.Location = new Point(145, 234);
+        calibrationYNumericUpDown.Location = new Point(145, 273);
         calibrationYNumericUpDown.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
         calibrationYNumericUpDown.Minimum = new decimal(new int[] { 10, 0, 0, int.MinValue });
         calibrationYNumericUpDown.Name = "calibrationYNumericUpDown";
         calibrationYNumericUpDown.Size = new Size(130, 23);
-        calibrationYNumericUpDown.TabIndex = 11;
+        calibrationYNumericUpDown.TabIndex = 14;
         //
         // saveCalibrationButton
         //
-        saveCalibrationButton.Location = new Point(287, 223);
+        saveCalibrationButton.Location = new Point(287, 262);
         saveCalibrationButton.Name = "saveCalibrationButton";
         saveCalibrationButton.Size = new Size(203, 34);
-        saveCalibrationButton.TabIndex = 12;
+        saveCalibrationButton.TabIndex = 15;
         saveCalibrationButton.Text = "Zapisz kalibrację";
         saveCalibrationButton.UseVisualStyleBackColor = true;
         //
         // settingsButton
         //
-        settingsButton.Location = new Point(24, 282);
+        settingsButton.Location = new Point(24, 321);
         settingsButton.Name = "settingsButton";
         settingsButton.Size = new Size(110, 34);
-        settingsButton.TabIndex = 13;
+        settingsButton.TabIndex = 16;
         settingsButton.Text = "Ustawienia";
         settingsButton.UseVisualStyleBackColor = true;
         //
         // previewButton
         //
-        previewButton.Location = new Point(287, 282);
+        previewButton.Location = new Point(287, 321);
         previewButton.Name = "previewButton";
         previewButton.Size = new Size(95, 34);
-        previewButton.TabIndex = 14;
+        previewButton.TabIndex = 18;
         previewButton.Text = "Podgląd";
         previewButton.UseVisualStyleBackColor = true;
         //
         // printButton
         //
-        printButton.Location = new Point(395, 282);
+        printButton.Location = new Point(395, 321);
         printButton.Name = "printButton";
         printButton.Size = new Size(95, 34);
-        printButton.TabIndex = 15;
+        printButton.TabIndex = 19;
         printButton.Text = "Drukuj";
         printButton.UseVisualStyleBackColor = true;
         //
         // Form1
         //
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size(519, 340);
+        ClientSize = new Size(519, 379);
         Controls.Add(printButton);
         Controls.Add(previewButton);
+        Controls.Add(profilesButton);
         Controls.Add(settingsButton);
         Controls.Add(saveCalibrationButton);
         Controls.Add(calibrationYNumericUpDown);
@@ -220,6 +251,8 @@ partial class Form1
         Controls.Add(quantityPromptLabel);
         Controls.Add(firstNumberNumericUpDown);
         Controls.Add(firstNumberPromptLabel);
+        Controls.Add(profileComboBox);
+        Controls.Add(profilePromptLabel);
         Controls.Add(printerComboBox);
         Controls.Add(printerPromptLabel);
         FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -239,6 +272,9 @@ partial class Form1
 
     private Label printerPromptLabel;
     private ComboBox printerComboBox;
+    private Label profilePromptLabel;
+    private ComboBox profileComboBox;
+    private Button profilesButton;
     private Label firstNumberPromptLabel;
     private NumericUpDown firstNumberNumericUpDown;
     private Label quantityPromptLabel;

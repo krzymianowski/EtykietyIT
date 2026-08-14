@@ -31,13 +31,18 @@ public sealed class AppBootstrapper
         var printerCalibrationService = new PrinterCalibrationService(
             jsonFileStore,
             dataPaths.PrinterCalibrationsFilePath);
+        var labelProfileService = new LabelProfileService(
+            jsonFileStore,
+            Path.Combine(executableDirectory, "Resources", "Profiles"),
+            dataPaths.ProfilesDirectory);
 
         return new AppServices(
             mode,
             dataPaths,
             jsonFileStore,
             settingsService,
-            printerCalibrationService);
+            printerCalibrationService,
+            labelProfileService);
     }
 
     private static void CreateDataDirectories(AppDataPaths dataPaths)

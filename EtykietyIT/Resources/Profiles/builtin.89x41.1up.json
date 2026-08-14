@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "builtin.89x41.1up",
+  "name": "89 × 41 mm — 1 etykieta",
+  "widthMm": 89.0,
+  "heightMm": 41.0,
+  "columns": 1,
+  "rows": 1,
+  "drawCutLines": false
+}

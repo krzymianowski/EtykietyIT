@@ -22,6 +22,7 @@ static class Program
             Application.Run(new Form1(
                 services.SettingsService,
                 services.PrinterCalibrationService,
+                services.LabelProfileService,
                 settings));
         }
         catch (Exception exception)

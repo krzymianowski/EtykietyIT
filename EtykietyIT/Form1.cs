@@ -8,42 +8,50 @@ namespace EtykietyIT;
 
 public partial class Form1 : Form
 {
-    private const double LabelWidthMm = 89.0;
-    private const double LabelHeightMm = 41.0;
-    private const int LabelColumns = 2;
-    private const int LabelRows = 1;
-    private const bool DrawCutLines = true;
-
     private readonly SettingsService _settingsService;
     private readonly PrinterCalibrationService _printerCalibrationService;
+    private readonly LabelProfileService _labelProfileService;
 
     private ApplicationSettings _settings;
+    private LabelProfile? _selectedProfile;
+    private bool _loadingProfiles;
 
     public Form1(
         SettingsService settingsService,
         PrinterCalibrationService printerCalibrationService,
+        LabelProfileService labelProfileService,
         ApplicationSettings settings)
     {
         _settingsService = settingsService ??
             throw new ArgumentNullException(nameof(settingsService));
         _printerCalibrationService = printerCalibrationService ??
             throw new ArgumentNullException(nameof(printerCalibrationService));
+        _labelProfileService = labelProfileService ??
+            throw new ArgumentNullException(nameof(labelProfileService));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _settings.Validate();
 
         InitializeComponent();
 
         printerComboBox.SelectedIndexChanged += PrinterComboBox_SelectedIndexChanged;
+        profileComboBox.SelectedIndexChanged += ProfileComboBox_SelectedIndexChanged;
         firstNumberNumericUpDown.ValueChanged += NumberInput_ValueChanged;
         quantityNumericUpDown.ValueChanged += NumberInput_ValueChanged;
         settingsButton.Click += SettingsButton_Click;
+        profilesButton.Click += ProfilesButton_Click;
         saveCalibrationButton.Click += SaveCalibrationButton_Click;
         previewButton.Click += PreviewButton_Click;
         printButton.Click += PrintButton_Click;
+        Shown += Form1_Shown;
 
         firstNumberNumericUpDown.Value = _settings.NextAssetNumber;
         LoadInstalledPrinters();
         UpdateAssetRange();
+    }
+
+    private async void Form1_Shown(object? sender, EventArgs e)
+    {
+        await ReloadProfilesAsync(_settings.DefaultProfileId);
     }
 
     private void LoadInstalledPrinters()
@@ -123,6 +131,43 @@ public partial class Form1 : Form
         UpdateAssetRange();
     }
 
+    private async void ProfileComboBox_SelectedIndexChanged(
+        object? sender,
+        EventArgs e)
+    {
+        _selectedProfile = profileComboBox.SelectedItem as LabelProfile;
+        UpdatePrintButtons();
+
+        if (_loadingProfiles || _selectedProfile is null || string.Equals(
+            _settings.DefaultProfileId,
+            _selectedProfile.Id,
+            StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        ApplicationSettings updatedSettings = _settings with
+        {
+            DefaultProfileId = _selectedProfile.Id
+        };
+
+        profileComboBox.Enabled = false;
+        try
+        {
+            await _settingsService.SaveAsync(updatedSettings);
+            _settings = updatedSettings;
+        }
+        catch (Exception exception)
+        {
+            ShowError(
+                $"Nie udało się zapisać domyślnego profilu.\r\n\r\n{exception.Message}");
+        }
+        finally
+        {
+            profileComboBox.Enabled = true;
+        }
+    }
+
     private async void SettingsButton_Click(object? sender, EventArgs e)
     {
         string[] installedPrinters = printerComboBox.Items
@@ -146,6 +191,17 @@ public partial class Form1 : Form
         {
             ShowError($"Nie udało się zapisać ustawień.\r\n\r\n{exception.Message}");
         }
+    }
+
+    private async void ProfilesButton_Click(object? sender, EventArgs e)
+    {
+        string preferredProfileId = _selectedProfile?.Id ??
+            _settings.DefaultProfileId;
+
+        using var profilesForm = new ProfilesForm(_labelProfileService);
+        profilesForm.ShowDialog(this);
+
+        await ReloadProfilesAsync(preferredProfileId);
     }
 
     private async void SaveCalibrationButton_Click(object? sender, EventArgs e)
@@ -225,7 +281,8 @@ public partial class Form1 : Form
         int startNumber = decimal.ToInt32(firstNumberNumericUpDown.Value);
         int quantity = decimal.ToInt32(quantityNumericUpDown.Value);
         int endNumber = startNumber + quantity - 1;
-        int slotsPerPhysicalLabel = LabelColumns * LabelRows;
+        LabelProfile profile = GetSelectedProfile();
+        int slotsPerPhysicalLabel = profile.Columns * profile.Rows;
         PrinterCalibration calibration = GetPrinterCalibration();
         int physicalLabels = (int)Math.Ceiling(
             quantity / (double)slotsPerPhysicalLabel);
@@ -288,6 +345,7 @@ public partial class Form1 : Form
         PrinterCalibration calibration,
         LabelRenderMode renderMode)
     {
+        LabelProfile profile = GetSelectedProfile();
         var content = new LabelContentOptions(
             _settings.CompanyName,
             _settings.AssetId.Prefix,
@@ -296,11 +354,11 @@ public partial class Form1 : Form
             printerName,
             startNumber,
             quantity,
-            LabelWidthMm,
-            LabelHeightMm,
-            LabelColumns,
-            LabelRows,
-            DrawCutLines,
+            profile.WidthMm,
+            profile.HeightMm,
+            profile.Columns,
+            profile.Rows,
+            profile.DrawCutLines,
             content,
             calibration,
             renderMode);
@@ -354,6 +412,72 @@ public partial class Form1 : Form
         return printerComboBox.SelectedItem as string;
     }
 
+    private LabelProfile GetSelectedProfile()
+    {
+        return _selectedProfile ?? throw new InvalidOperationException(
+            "Nie wybrano profilu etykiety.");
+    }
+
+    private async Task ReloadProfilesAsync(string preferredProfileId)
+    {
+        try
+        {
+            IReadOnlyList<LabelProfile> profiles =
+                await _labelProfileService.GetAllAsync();
+            LabelProfile selectedProfile =
+                await _labelProfileService.GetProfileOrDefaultAsync(
+                    preferredProfileId);
+
+            _loadingProfiles = true;
+            try
+            {
+                profileComboBox.DataSource = null;
+                profileComboBox.DisplayMember = nameof(LabelProfile.Name);
+                profileComboBox.DataSource = profiles.ToList();
+
+                for (int index = 0; index < profiles.Count; index++)
+                {
+                    if (string.Equals(
+                        profiles[index].Id,
+                        selectedProfile.Id,
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        profileComboBox.SelectedIndex = index;
+                        break;
+                    }
+                }
+
+                _selectedProfile = selectedProfile;
+            }
+            finally
+            {
+                _loadingProfiles = false;
+            }
+
+            if (!string.Equals(
+                _settings.DefaultProfileId,
+                selectedProfile.Id,
+                StringComparison.OrdinalIgnoreCase))
+            {
+                ApplicationSettings updatedSettings = _settings with
+                {
+                    DefaultProfileId = selectedProfile.Id
+                };
+                await _settingsService.SaveAsync(updatedSettings);
+                _settings = updatedSettings;
+            }
+
+            UpdatePrintButtons();
+        }
+        catch (Exception exception)
+        {
+            _selectedProfile = null;
+            profileComboBox.DataSource = null;
+            UpdatePrintButtons();
+            ShowError($"Nie udało się wczytać profili.\r\n\r\n{exception.Message}");
+        }
+    }
+
     private string FormatAssetId(int number)
     {
         return AssetIdFormatter.Format(
@@ -375,8 +499,9 @@ public partial class Form1 : Form
     private void UpdatePrintButtons()
     {
         bool hasSelectedPrinter = GetSelectedPrinterName() is not null;
-        previewButton.Enabled = hasSelectedPrinter;
-        printButton.Enabled = hasSelectedPrinter;
+        bool hasSelectedProfile = _selectedProfile is not null;
+        previewButton.Enabled = hasSelectedPrinter && hasSelectedProfile;
+        printButton.Enabled = hasSelectedPrinter && hasSelectedProfile;
         saveCalibrationButton.Enabled = hasSelectedPrinter;
         calibrationXNumericUpDown.Enabled = hasSelectedPrinter;
         calibrationYNumericUpDown.Enabled = hasSelectedPrinter;
