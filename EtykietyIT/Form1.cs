@@ -1,4 +1,5 @@
 using System.Drawing.Printing;
+using EtykietyIT.Export;
 using EtykietyIT.Forms;
 using EtykietyIT.Models;
 using EtykietyIT.Printing;
@@ -12,6 +13,7 @@ public partial class Form1 : Form
     private readonly PrinterCalibrationService _printerCalibrationService;
     private readonly LabelProfileService _labelProfileService;
     private readonly PrintHistoryService _printHistoryService;
+    private readonly IHistoryExporter _historyExporter;
 
     private ApplicationSettings _settings;
     private LabelProfile? _selectedProfile;
@@ -22,6 +24,7 @@ public partial class Form1 : Form
         PrinterCalibrationService printerCalibrationService,
         LabelProfileService labelProfileService,
         PrintHistoryService printHistoryService,
+        IHistoryExporter historyExporter,
         ApplicationSettings settings)
     {
         _settingsService = settingsService ??
@@ -32,6 +35,8 @@ public partial class Form1 : Form
             throw new ArgumentNullException(nameof(labelProfileService));
         _printHistoryService = printHistoryService ??
             throw new ArgumentNullException(nameof(printHistoryService));
+        _historyExporter = historyExporter ??
+            throw new ArgumentNullException(nameof(historyExporter));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _settings.Validate();
 
@@ -211,7 +216,9 @@ public partial class Form1 : Form
 
     private void HistoryButton_Click(object? sender, EventArgs e)
     {
-        using var historyForm = new HistoryForm(_printHistoryService);
+        using var historyForm = new HistoryForm(
+            _printHistoryService,
+            _historyExporter);
         historyForm.ShowDialog(this);
     }
 

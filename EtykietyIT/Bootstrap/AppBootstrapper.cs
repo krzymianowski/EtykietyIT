@@ -1,3 +1,4 @@
+using EtykietyIT.Export;
 using EtykietyIT.Models;
 using EtykietyIT.Persistence;
 using EtykietyIT.Services;
@@ -37,6 +38,7 @@ public sealed class AppBootstrapper
             dataPaths.ProfilesDirectory);
         var printHistoryService = new PrintHistoryService(
             dataPaths.HistoryFilePath);
+        IHistoryExporter historyExporter = new CsvHistoryExporter();
 
         return new AppServices(
             mode,
@@ -45,7 +47,8 @@ public sealed class AppBootstrapper
             settingsService,
             printerCalibrationService,
             labelProfileService,
-            printHistoryService);
+            printHistoryService,
+            historyExporter);
     }
 
     private static void CreateDataDirectories(AppDataPaths dataPaths)

@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using EtykietyIT.Export;
 using EtykietyIT.Models;
 using EtykietyIT.Services;
 
@@ -8,13 +9,20 @@ namespace EtykietyIT.Forms;
 public partial class HistoryForm : Form
 {
     private readonly PrintHistoryService _printHistoryService;
+    private readonly IHistoryExporter _historyExporter;
     private IReadOnlyList<PrintHistoryEntry> _entries =
         Array.Empty<PrintHistoryEntry>();
+    private IReadOnlyList<PrintHistoryEntry> _visibleEntries =
+        Array.Empty<PrintHistoryEntry>();
 
-    public HistoryForm(PrintHistoryService printHistoryService)
+    public HistoryForm(
+        PrintHistoryService printHistoryService,
+        IHistoryExporter historyExporter)
     {
         _printHistoryService = printHistoryService ??
             throw new ArgumentNullException(nameof(printHistoryService));
+        _historyExporter = historyExporter ??
+            throw new ArgumentNullException(nameof(historyExporter));
 
         InitializeComponent();
         InitializeGridColumns();
@@ -29,6 +37,7 @@ public partial class HistoryForm : Form
         dateFromDateTimePicker.ValueChanged += FilterControl_Changed;
         dateToDateTimePicker.ValueChanged += FilterControl_Changed;
         historyDataGridView.SelectionChanged += HistoryDataGridView_SelectionChanged;
+        exportCsvButton.Click += ExportCsvButton_Click;
         closeButton.Click += CloseButton_Click;
     }
 
@@ -115,6 +124,65 @@ public partial class HistoryForm : Form
         Close();
     }
 
+    private async void ExportCsvButton_Click(object? sender, EventArgs e)
+    {
+        if (_visibleEntries.Count == 0)
+        {
+            MessageBox.Show(
+                this,
+                "Brak widocznych rekordów do wyeksportowania.",
+                "Eksport CSV",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+            return;
+        }
+
+        PrintHistoryEntry[] entriesToExport = _visibleEntries.ToArray();
+        using var saveFileDialog = new SaveFileDialog
+        {
+            AddExtension = true,
+            DefaultExt = "csv",
+            FileName = $"EtykietyIT_Historia_{DateTime.Now:yyyy-MM-dd_HHmm}.csv",
+            Filter = "Pliki CSV (*.csv)|*.csv",
+            OverwritePrompt = true,
+            Title = "Eksportuj historię do CSV"
+        };
+
+        if (saveFileDialog.ShowDialog(this) != DialogResult.OK)
+        {
+            return;
+        }
+
+        exportCsvButton.Enabled = false;
+        try
+        {
+            await _historyExporter.ExportAsync(
+                entriesToExport,
+                saveFileDialog.FileName);
+            string fullPath = Path.GetFullPath(saveFileDialog.FileName);
+
+            MessageBox.Show(
+                this,
+                $"Wyeksportowano rekordów: {entriesToExport.Length}\r\n\r\n{fullPath}",
+                "Eksport CSV zakończony",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show(
+                this,
+                $"Nie udało się zapisać pliku CSV.\r\n\r\n{exception.Message}",
+                "Błąd eksportu CSV",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+        }
+        finally
+        {
+            exportCsvButton.Enabled = true;
+        }
+    }
+
     private void ApplyFilters()
     {
         string query = searchTextBox.Text;
@@ -133,12 +201,12 @@ public partial class HistoryForm : Form
             });
         }
 
-        PrintHistoryEntry[] visibleEntries = filteredEntries
+        _visibleEntries = filteredEntries
             .OrderByDescending(entry => entry.TimestampUtc)
             .ToArray();
 
         historyDataGridView.Rows.Clear();
-        foreach (PrintHistoryEntry entry in visibleEntries)
+        foreach (PrintHistoryEntry entry in _visibleEntries)
         {
             PrintHistorySnapshot snapshot = entry.Snapshot;
             DateTimeOffset localTimestamp = entry.TimestampUtc.ToLocalTime();

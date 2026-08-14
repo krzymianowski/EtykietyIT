@@ -1,3 +1,4 @@
+using EtykietyIT.Export;
 using EtykietyIT.Models;
 using EtykietyIT.Persistence;
 using EtykietyIT.Services;
@@ -13,7 +14,8 @@ public sealed class AppServices
         SettingsService settingsService,
         PrinterCalibrationService printerCalibrationService,
         LabelProfileService labelProfileService,
-        PrintHistoryService printHistoryService)
+        PrintHistoryService printHistoryService,
+        IHistoryExporter historyExporter)
     {
         ApplicationMode = applicationMode;
         DataPaths = dataPaths ?? throw new ArgumentNullException(nameof(dataPaths));
@@ -26,6 +28,8 @@ public sealed class AppServices
             throw new ArgumentNullException(nameof(labelProfileService));
         PrintHistoryService = printHistoryService ??
             throw new ArgumentNullException(nameof(printHistoryService));
+        HistoryExporter = historyExporter ??
+            throw new ArgumentNullException(nameof(historyExporter));
     }
 
     public ApplicationMode ApplicationMode { get; }
@@ -41,4 +45,6 @@ public sealed class AppServices
     public LabelProfileService LabelProfileService { get; }
 
     public PrintHistoryService PrintHistoryService { get; }
+
+    public IHistoryExporter HistoryExporter { get; }
 }
