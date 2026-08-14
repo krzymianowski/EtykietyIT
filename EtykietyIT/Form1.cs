@@ -10,17 +10,22 @@ namespace EtykietyIT;
 public partial class Form1 : Form
 {
     private readonly SettingsService _settingsService;
+    private readonly OrganizationProfileService _organizationProfileService;
     private readonly PrinterCalibrationService _printerCalibrationService;
     private readonly LabelProfileService _labelProfileService;
     private readonly PrintHistoryService _printHistoryService;
     private readonly IHistoryExporter _historyExporter;
 
     private ApplicationSettings _settings;
+    private OrganizationProfile? _activeOrganization;
     private LabelProfile? _selectedProfile;
+    private bool _loadingOrganizations;
+    private bool _applyingOrganization;
     private bool _loadingProfiles;
 
     public Form1(
         SettingsService settingsService,
+        OrganizationProfileService organizationProfileService,
         PrinterCalibrationService printerCalibrationService,
         LabelProfileService labelProfileService,
         PrintHistoryService printHistoryService,
@@ -29,6 +34,8 @@ public partial class Form1 : Form
     {
         _settingsService = settingsService ??
             throw new ArgumentNullException(nameof(settingsService));
+        _organizationProfileService = organizationProfileService ??
+            throw new ArgumentNullException(nameof(organizationProfileService));
         _printerCalibrationService = printerCalibrationService ??
             throw new ArgumentNullException(nameof(printerCalibrationService));
         _labelProfileService = labelProfileService ??
@@ -42,11 +49,13 @@ public partial class Form1 : Form
 
         InitializeComponent();
 
+        organizationComboBox.SelectedIndexChanged +=
+            OrganizationComboBox_SelectedIndexChanged;
+        manageOrganizationsButton.Click += ManageOrganizationsButton_Click;
         printerComboBox.SelectedIndexChanged += PrinterComboBox_SelectedIndexChanged;
         profileComboBox.SelectedIndexChanged += ProfileComboBox_SelectedIndexChanged;
         firstNumberNumericUpDown.ValueChanged += NumberInput_ValueChanged;
         quantityNumericUpDown.ValueChanged += NumberInput_ValueChanged;
-        settingsButton.Click += SettingsButton_Click;
         profilesButton.Click += ProfilesButton_Click;
         historyButton.Click += HistoryButton_Click;
         saveCalibrationButton.Click += SaveCalibrationButton_Click;
@@ -54,14 +63,14 @@ public partial class Form1 : Form
         printButton.Click += PrintButton_Click;
         Shown += Form1_Shown;
 
-        firstNumberNumericUpDown.Value = _settings.NextAssetNumber;
+        firstNumberNumericUpDown.Value = 1;
         LoadInstalledPrinters();
         UpdateAssetRange();
     }
 
     private async void Form1_Shown(object? sender, EventArgs e)
     {
-        await ReloadProfilesAsync(_settings.DefaultProfileId);
+        await ReloadOrganizationsAsync(_settings.ActiveOrganizationProfileId);
     }
 
     private void LoadInstalledPrinters()
@@ -72,8 +81,71 @@ public partial class Form1 : Form
             printerComboBox.Items.Add(printerName);
         }
 
-        SelectPreferredPrinter(_settings.DefaultPrinterName);
+        printerComboBox.SelectedIndex = -1;
         UpdatePrintButtons();
+    }
+
+    private async void OrganizationComboBox_SelectedIndexChanged(
+        object? sender,
+        EventArgs e)
+    {
+        if (_loadingOrganizations ||
+            organizationComboBox.SelectedItem is not OrganizationProfile selected)
+        {
+            return;
+        }
+
+        string previousOrganizationId = _settings.ActiveOrganizationProfileId;
+        var updatedSettings = _settings with
+        {
+            ActiveOrganizationProfileId = selected.Id
+        };
+
+        organizationComboBox.Enabled = false;
+        try
+        {
+            await _settingsService.SaveAsync(updatedSettings);
+            _settings = updatedSettings;
+            await ApplyOrganizationAsync(selected);
+        }
+        catch (Exception exception)
+        {
+            ShowError(
+                $"Nie udało się przełączyć organizacji.\r\n\r\n{exception.Message}");
+            await ReloadOrganizationsAsync(previousOrganizationId);
+        }
+        finally
+        {
+            organizationComboBox.Enabled = true;
+        }
+    }
+
+    private async void ManageOrganizationsButton_Click(
+        object? sender,
+        EventArgs e)
+    {
+        string[] installedPrinters = printerComboBox.Items
+            .Cast<string>()
+            .ToArray();
+        using var organizationsForm = new OrganizationsForm(
+            _organizationProfileService,
+            _labelProfileService,
+            _settingsService,
+            _settings,
+            installedPrinters);
+        organizationsForm.ShowDialog(this);
+
+        try
+        {
+            _settings = await _settingsService.LoadAsync();
+            await ReloadOrganizationsAsync(
+                _settings.ActiveOrganizationProfileId);
+        }
+        catch (Exception exception)
+        {
+            ShowError(
+                $"Nie udało się odświeżyć organizacji.\r\n\r\n{exception.Message}");
+        }
     }
 
     private void SelectPreferredPrinter(string? preferredPrinterName)
@@ -96,14 +168,9 @@ public partial class Form1 : Form
             }
         }
 
-        if (printerComboBox.Items.Count > 0)
-        {
-            printerComboBox.SelectedIndex = dymoIndex >= 0 ? dymoIndex : 0;
-        }
-        else
-        {
-            SetCalibrationControls(new PrinterCalibration());
-        }
+        printerComboBox.SelectedIndex = printerComboBox.Items.Count > 0
+            ? dymoIndex >= 0 ? dymoIndex : 0
+            : -1;
     }
 
     private int FindPrinterIndex(string? printerName)
@@ -133,7 +200,47 @@ public partial class Form1 : Form
         EventArgs e)
     {
         UpdatePrintButtons();
-        await LoadCalibrationForSelectedPrinterAsync();
+        if (_applyingOrganization)
+        {
+            return;
+        }
+
+        printerComboBox.Enabled = false;
+        try
+        {
+            string? printerName = GetSelectedPrinterName();
+            OrganizationProfile? organization = _activeOrganization;
+            if (organization is not null && !string.Equals(
+                organization.DefaultPrinterName,
+                printerName,
+                StringComparison.OrdinalIgnoreCase))
+            {
+                OrganizationProfile updated = organization with
+                {
+                    DefaultPrinterName = printerName
+                };
+                try
+                {
+                    await _organizationProfileService.UpdateAsync(updated);
+                    if (IsActiveOrganization(organization.Id))
+                    {
+                        _activeOrganization = updated;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    ShowError(
+                        "Nie udało się zapisać domyślnej drukarki organizacji." +
+                        $"\r\n\r\n{exception.Message}");
+                }
+            }
+
+            await LoadCalibrationForSelectedPrinterAsync();
+        }
+        finally
+        {
+            printerComboBox.Enabled = true;
+        }
     }
 
     private void NumberInput_ValueChanged(object? sender, EventArgs e)
@@ -148,29 +255,34 @@ public partial class Form1 : Form
         _selectedProfile = profileComboBox.SelectedItem as LabelProfile;
         UpdatePrintButtons();
 
-        if (_loadingProfiles || _selectedProfile is null || string.Equals(
-            _settings.DefaultProfileId,
-            _selectedProfile.Id,
-            StringComparison.OrdinalIgnoreCase))
+        OrganizationProfile? organization = _activeOrganization;
+        if (_loadingProfiles || organization is null ||
+            _selectedProfile is null || string.Equals(
+                organization.DefaultLabelProfileId,
+                _selectedProfile.Id,
+                StringComparison.OrdinalIgnoreCase))
         {
             return;
         }
 
-        ApplicationSettings updatedSettings = _settings with
-        {
-            DefaultProfileId = _selectedProfile.Id
-        };
-
         profileComboBox.Enabled = false;
         try
         {
-            await _settingsService.SaveAsync(updatedSettings);
-            _settings = updatedSettings;
+            OrganizationProfile updated = organization with
+            {
+                DefaultLabelProfileId = _selectedProfile.Id
+            };
+            await _organizationProfileService.UpdateAsync(updated);
+            if (IsActiveOrganization(organization.Id))
+            {
+                _activeOrganization = updated;
+            }
         }
         catch (Exception exception)
         {
             ShowError(
-                $"Nie udało się zapisać domyślnego profilu.\r\n\r\n{exception.Message}");
+                "Nie udało się zapisać domyślnego profilu etykiety " +
+                $"organizacji.\r\n\r\n{exception.Message}");
         }
         finally
         {
@@ -178,40 +290,22 @@ public partial class Form1 : Form
         }
     }
 
-    private async void SettingsButton_Click(object? sender, EventArgs e)
-    {
-        string[] installedPrinters = printerComboBox.Items
-            .Cast<string>()
-            .ToArray();
-
-        using var settingsForm = new SettingsForm(_settings, installedPrinters);
-        if (settingsForm.ShowDialog(this) != DialogResult.OK)
-        {
-            return;
-        }
-
-        try
-        {
-            await _settingsService.SaveAsync(settingsForm.Settings);
-            _settings = settingsForm.Settings;
-            UpdateAssetRange();
-            SelectPreferredPrinter(_settings.DefaultPrinterName);
-        }
-        catch (Exception exception)
-        {
-            ShowError($"Nie udało się zapisać ustawień.\r\n\r\n{exception.Message}");
-        }
-    }
-
     private async void ProfilesButton_Click(object? sender, EventArgs e)
     {
         string preferredProfileId = _selectedProfile?.Id ??
-            _settings.DefaultProfileId;
+            GetActiveOrganization().DefaultLabelProfileId;
 
         using var profilesForm = new ProfilesForm(_labelProfileService);
         profilesForm.ShowDialog(this);
 
-        await ReloadProfilesAsync(preferredProfileId);
+        try
+        {
+            await ReloadLabelProfilesAsync(preferredProfileId);
+        }
+        catch (Exception exception)
+        {
+            ShowError($"Nie udało się odświeżyć profili.\r\n\r\n{exception.Message}");
+        }
     }
 
     private void HistoryButton_Click(object? sender, EventArgs e)
@@ -239,7 +333,7 @@ public partial class Form1 : Form
 
             MessageBox.Show(
                 this,
-                $"Zapisano kalibrację drukarki:\r\n{printerName}",
+                $"Zapisano globalną kalibrację drukarki:\r\n{printerName}",
                 "Kalibracja drukarki",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
@@ -259,8 +353,11 @@ public partial class Form1 : Form
             return;
         }
 
-        int startNumber = decimal.ToInt32(firstNumberNumericUpDown.Value);
-        int quantity = decimal.ToInt32(quantityNumericUpDown.Value);
+        if (!TryGetPrintRange(out int startNumber, out int quantity, out _))
+        {
+            return;
+        }
+
         PrinterCalibration calibration = GetPrinterCalibration();
 
         try
@@ -296,9 +393,15 @@ public partial class Form1 : Form
             return;
         }
 
-        int startNumber = decimal.ToInt32(firstNumberNumericUpDown.Value);
-        int quantity = decimal.ToInt32(quantityNumericUpDown.Value);
-        int endNumber = startNumber + quantity - 1;
+        if (!TryGetPrintRange(
+            out int startNumber,
+            out int quantity,
+            out int endNumber))
+        {
+            return;
+        }
+
+        OrganizationProfile organization = GetActiveOrganization();
         LabelProfile profile = GetSelectedProfile();
         int slotsPerPhysicalLabel = profile.Columns * profile.Rows;
         PrinterCalibration calibration = GetPrinterCalibration();
@@ -306,6 +409,7 @@ public partial class Form1 : Form
             quantity / (double)slotsPerPhysicalLabel);
 
         string confirmation =
+            $"Organizacja: {organization.Name}\r\n" +
             $"Drukarka: {printerName}\r\n" +
             $"Zakres: {FormatAssetId(startNumber)} – {FormatAssetId(endNumber)}\r\n" +
             $"Małych etykiet: {quantity}\r\n" +
@@ -347,13 +451,15 @@ public partial class Form1 : Form
             ApplicationVersion = Application.ProductVersion,
             Snapshot = new PrintHistorySnapshot
             {
+                OrganizationProfileId = organization.Id,
+                OrganizationProfileName = organization.Name,
                 StartNumber = startNumber,
                 EndNumber = endNumber,
-                FirstAssetId = FormatAssetId(startNumber),
-                LastAssetId = FormatAssetId(endNumber),
-                Prefix = _settings.AssetId.Prefix,
-                Digits = _settings.AssetId.Digits,
-                CompanyName = _settings.CompanyName,
+                FirstAssetId = FormatAssetId(startNumber, organization),
+                LastAssetId = FormatAssetId(endNumber, organization),
+                Prefix = organization.AssetId.Prefix,
+                Digits = organization.AssetId.Digits,
+                CompanyName = organization.CompanyName,
                 PrinterName = printerName,
                 OffsetXmm = calibration.OffsetXmm,
                 OffsetYmm = calibration.OffsetYmm,
@@ -380,26 +486,33 @@ public partial class Form1 : Form
                 this,
                 "Zadanie zostało przekazane do systemu drukowania Windows, " +
                 "ale nie udało się zapisać historii. Wydruk nie zostanie wysłany " +
-                "ponownie. Numeracja zostanie przesunięta, aby nie powtórzyć " +
-                $"wysłanego zakresu.\r\n\r\n{exception.Message}",
+                "ponownie. Numeracja organizacji zostanie przesunięta, aby nie " +
+                $"powtórzyć wysłanego zakresu.\r\n\r\n{exception.Message}",
                 "Błąd zapisu historii",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Warning);
         }
 
-        int nextAssetNumber = endNumber + 1;
-        _settings = _settings with { NextAssetNumber = nextAssetNumber };
-        firstNumberNumericUpDown.Value = nextAssetNumber;
-
+        OrganizationProfile updatedOrganization = organization with
+        {
+            NextAssetNumber = endNumber + 1
+        };
         try
         {
-            await _settingsService.SaveAsync(_settings);
+            await _organizationProfileService.UpdateAsync(updatedOrganization);
+            if (IsActiveOrganization(organization.Id))
+            {
+                _activeOrganization = updatedOrganization;
+                firstNumberNumericUpDown.Value =
+                    updatedOrganization.NextAssetNumber;
+            }
         }
         catch (Exception exception)
         {
             ShowError(
-                "Zadanie zostało przekazane do systemu drukowania, ale nie udało się " +
-                $"zapisać następnego numeru.\r\n\r\n{exception.Message}");
+                "Zadanie zostało przekazane do systemu drukowania, ale nie udało " +
+                "się zapisać następnego numeru aktywnej organizacji." +
+                $"\r\n\r\n{exception.Message}");
         }
     }
 
@@ -410,11 +523,12 @@ public partial class Form1 : Form
         PrinterCalibration calibration,
         LabelRenderMode renderMode)
     {
+        OrganizationProfile organization = GetActiveOrganization();
         LabelProfile profile = GetSelectedProfile();
         var content = new LabelContentOptions(
-            _settings.CompanyName,
-            _settings.AssetId.Prefix,
-            _settings.AssetId.Digits);
+            organization.CompanyName,
+            organization.AssetId.Prefix,
+            organization.AssetId.Digits);
         var options = new LabelPrintOptions(
             printerName,
             startNumber,
@@ -429,6 +543,132 @@ public partial class Form1 : Form
             renderMode);
 
         return new LabelPrintJob(options);
+    }
+
+    private async Task ReloadOrganizationsAsync(string preferredOrganizationId)
+    {
+        try
+        {
+            OrganizationProfileReadResult result =
+                await _organizationProfileService.GetAllAsync();
+            OrganizationProfile selected = result.Profiles.FirstOrDefault(
+                profile => string.Equals(
+                    profile.Id,
+                    preferredOrganizationId,
+                    StringComparison.Ordinal)) ?? result.Profiles.FirstOrDefault()
+                    ?? throw new InvalidOperationException(
+                        "Brak dostępnych profili organizacji.");
+
+            _loadingOrganizations = true;
+            try
+            {
+                organizationComboBox.DataSource = null;
+                organizationComboBox.DisplayMember = nameof(OrganizationProfile.Name);
+                organizationComboBox.DataSource = result.Profiles.ToList();
+                organizationComboBox.SelectedItem = result.Profiles.First(
+                    profile => string.Equals(
+                        profile.Id,
+                        selected.Id,
+                        StringComparison.Ordinal));
+            }
+            finally
+            {
+                _loadingOrganizations = false;
+            }
+
+            if (!string.Equals(
+                _settings.ActiveOrganizationProfileId,
+                selected.Id,
+                StringComparison.Ordinal))
+            {
+                ApplicationSettings updatedSettings = _settings with
+                {
+                    ActiveOrganizationProfileId = selected.Id
+                };
+                await _settingsService.SaveAsync(updatedSettings);
+                _settings = updatedSettings;
+            }
+
+            await ApplyOrganizationAsync(selected);
+        }
+        catch (Exception exception)
+        {
+            _activeOrganization = null;
+            _selectedProfile = null;
+            organizationComboBox.DataSource = null;
+            profileComboBox.DataSource = null;
+            printerComboBox.SelectedIndex = -1;
+            UpdateAssetRange();
+            UpdatePrintButtons();
+            ShowError($"Nie udało się wczytać organizacji.\r\n\r\n{exception.Message}");
+        }
+    }
+
+    private async Task ApplyOrganizationAsync(OrganizationProfile organization)
+    {
+        _activeOrganization = organization;
+        _applyingOrganization = true;
+        try
+        {
+            firstNumberNumericUpDown.Value = organization.NextAssetNumber;
+            await ReloadLabelProfilesAsync(
+                organization.DefaultLabelProfileId);
+            SelectPreferredPrinter(organization.DefaultPrinterName);
+        }
+        finally
+        {
+            _applyingOrganization = false;
+        }
+
+        await LoadCalibrationForSelectedPrinterAsync();
+        UpdateAssetRange();
+        UpdatePrintButtons();
+    }
+
+    private async Task ReloadLabelProfilesAsync(string preferredProfileId)
+    {
+        IReadOnlyList<LabelProfile> profiles =
+            await _labelProfileService.GetAllAsync();
+        LabelProfile selectedProfile =
+            await _labelProfileService.GetProfileOrDefaultAsync(
+                preferredProfileId);
+
+        _loadingProfiles = true;
+        try
+        {
+            profileComboBox.DataSource = null;
+            profileComboBox.DisplayMember = nameof(LabelProfile.Name);
+            profileComboBox.DataSource = profiles.ToList();
+            profileComboBox.SelectedItem = profiles.First(profile =>
+                string.Equals(
+                    profile.Id,
+                    selectedProfile.Id,
+                    StringComparison.OrdinalIgnoreCase));
+            _selectedProfile = selectedProfile;
+        }
+        finally
+        {
+            _loadingProfiles = false;
+        }
+
+        OrganizationProfile? organization = _activeOrganization;
+        if (organization is not null && !string.Equals(
+            organization.DefaultLabelProfileId,
+            selectedProfile.Id,
+            StringComparison.OrdinalIgnoreCase))
+        {
+            OrganizationProfile updated = organization with
+            {
+                DefaultLabelProfileId = selectedProfile.Id
+            };
+            await _organizationProfileService.UpdateAsync(updated);
+            if (IsActiveOrganization(organization.Id))
+            {
+                _activeOrganization = updated;
+            }
+        }
+
+        UpdatePrintButtons();
     }
 
     private async Task LoadCalibrationForSelectedPrinterAsync()
@@ -477,96 +717,86 @@ public partial class Form1 : Form
         return printerComboBox.SelectedItem as string;
     }
 
+    private OrganizationProfile GetActiveOrganization()
+    {
+        return _activeOrganization ?? throw new InvalidOperationException(
+            "Nie wybrano profilu organizacji.");
+    }
+
     private LabelProfile GetSelectedProfile()
     {
         return _selectedProfile ?? throw new InvalidOperationException(
             "Nie wybrano profilu etykiety.");
     }
 
-    private async Task ReloadProfilesAsync(string preferredProfileId)
+    private bool IsActiveOrganization(string organizationId)
     {
-        try
-        {
-            IReadOnlyList<LabelProfile> profiles =
-                await _labelProfileService.GetAllAsync();
-            LabelProfile selectedProfile =
-                await _labelProfileService.GetProfileOrDefaultAsync(
-                    preferredProfileId);
-
-            _loadingProfiles = true;
-            try
-            {
-                profileComboBox.DataSource = null;
-                profileComboBox.DisplayMember = nameof(LabelProfile.Name);
-                profileComboBox.DataSource = profiles.ToList();
-
-                for (int index = 0; index < profiles.Count; index++)
-                {
-                    if (string.Equals(
-                        profiles[index].Id,
-                        selectedProfile.Id,
-                        StringComparison.OrdinalIgnoreCase))
-                    {
-                        profileComboBox.SelectedIndex = index;
-                        break;
-                    }
-                }
-
-                _selectedProfile = selectedProfile;
-            }
-            finally
-            {
-                _loadingProfiles = false;
-            }
-
-            if (!string.Equals(
-                _settings.DefaultProfileId,
-                selectedProfile.Id,
-                StringComparison.OrdinalIgnoreCase))
-            {
-                ApplicationSettings updatedSettings = _settings with
-                {
-                    DefaultProfileId = selectedProfile.Id
-                };
-                await _settingsService.SaveAsync(updatedSettings);
-                _settings = updatedSettings;
-            }
-
-            UpdatePrintButtons();
-        }
-        catch (Exception exception)
-        {
-            _selectedProfile = null;
-            profileComboBox.DataSource = null;
-            UpdatePrintButtons();
-            ShowError($"Nie udało się wczytać profili.\r\n\r\n{exception.Message}");
-        }
+        return string.Equals(
+            _activeOrganization?.Id,
+            organizationId,
+            StringComparison.Ordinal);
     }
 
     private string FormatAssetId(int number)
     {
+        return FormatAssetId(number, GetActiveOrganization());
+    }
+
+    private static string FormatAssetId(
+        int number,
+        OrganizationProfile organization)
+    {
         return AssetIdFormatter.Format(
             number,
-            _settings.AssetId.Prefix,
-            _settings.AssetId.Digits);
+            organization.AssetId.Prefix,
+            organization.AssetId.Digits);
     }
 
     private void UpdateAssetRange()
     {
+        if (_activeOrganization is null)
+        {
+            assetRangeLabel.Text = "—";
+            return;
+        }
+
         int startNumber = decimal.ToInt32(firstNumberNumericUpDown.Value);
         int quantity = decimal.ToInt32(quantityNumericUpDown.Value);
-        int endNumber = startNumber + quantity - 1;
+        long endNumber = (long)startNumber + quantity - 1;
+        assetRangeLabel.Text = endNumber <= int.MaxValue
+            ? $"{FormatAssetId(startNumber)} – {FormatAssetId((int)endNumber)}"
+            : "Zakres przekracza maksymalny numer";
+    }
 
-        assetRangeLabel.Text =
-            $"{FormatAssetId(startNumber)} – {FormatAssetId(endNumber)}";
+    private bool TryGetPrintRange(
+        out int startNumber,
+        out int quantity,
+        out int endNumber)
+    {
+        startNumber = decimal.ToInt32(firstNumberNumericUpDown.Value);
+        quantity = decimal.ToInt32(quantityNumericUpDown.Value);
+        long calculatedEndNumber = (long)startNumber + quantity - 1;
+        if (calculatedEndNumber >= int.MaxValue)
+        {
+            endNumber = default;
+            ShowError(
+                "Zakres Asset ID nie pozostawia prawidłowego następnego numeru.");
+            return false;
+        }
+
+        endNumber = (int)calculatedEndNumber;
+        return true;
     }
 
     private void UpdatePrintButtons()
     {
         bool hasSelectedPrinter = GetSelectedPrinterName() is not null;
         bool hasSelectedProfile = _selectedProfile is not null;
-        previewButton.Enabled = hasSelectedPrinter && hasSelectedProfile;
-        printButton.Enabled = hasSelectedPrinter && hasSelectedProfile;
+        bool hasOrganization = _activeOrganization is not null;
+        previewButton.Enabled =
+            hasSelectedPrinter && hasSelectedProfile && hasOrganization;
+        printButton.Enabled =
+            hasSelectedPrinter && hasSelectedProfile && hasOrganization;
         saveCalibrationButton.Enabled = hasSelectedPrinter;
         calibrationXNumericUpDown.Enabled = hasSelectedPrinter;
         calibrationYNumericUpDown.Enabled = hasSelectedPrinter;

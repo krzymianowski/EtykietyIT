@@ -7,51 +7,33 @@ namespace EtykietyIT.Tests.Models;
 public sealed class ApplicationSettingsTests
 {
     [TestMethod]
-    public void Validate_AcceptsDefaultSettings()
+    public void Validate_AcceptsSchemaVersionTwoWithActiveOrganization()
     {
-        var settings = new ApplicationSettings();
+        var settings = new ApplicationSettings
+        {
+            ActiveOrganizationProfileId = $"organization.{Guid.NewGuid():D}"
+        };
 
         settings.Validate();
     }
 
     [TestMethod]
-    public void Validate_RejectsEmptyCompanyName()
+    public void Validate_RejectsMissingActiveOrganization()
     {
-        var settings = new ApplicationSettings { CompanyName = " " };
+        var settings = new ApplicationSettings();
 
-        AssertInvalid(settings.Validate);
+        Assert.ThrowsExactly<InvalidOperationException>(settings.Validate);
     }
 
     [TestMethod]
-    public void Validate_RejectsInvalidAssetIdSettings()
+    public void Validate_RejectsLegacySchemaVersion()
     {
         var settings = new ApplicationSettings
         {
-            AssetId = new AssetIdSettings { Digits = 0 }
+            SchemaVersion = 1,
+            ActiveOrganizationProfileId = $"organization.{Guid.NewGuid():D}"
         };
 
-        AssertInvalid(settings.Validate);
-    }
-
-    [TestMethod]
-    public void Validate_RejectsNegativeNextAssetNumber()
-    {
-        var settings = new ApplicationSettings { NextAssetNumber = -1 };
-
-        AssertInvalid(settings.Validate);
-    }
-
-    private static void AssertInvalid(Action validation)
-    {
-        try
-        {
-            validation();
-        }
-        catch (InvalidOperationException)
-        {
-            return;
-        }
-
-        Assert.Fail("Oczekiwano błędu walidacji.");
+        Assert.ThrowsExactly<InvalidOperationException>(settings.Validate);
     }
 }

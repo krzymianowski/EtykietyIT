@@ -74,6 +74,8 @@ public partial class HistoryForm : Form
         historyDataGridView.Columns.Add(
             CreateTextColumn("quantityColumn", "Liczba", 55));
         historyDataGridView.Columns.Add(
+            CreateTextColumn("organizationColumn", "Organizacja", 130));
+        historyDataGridView.Columns.Add(
             CreateTextColumn("profileColumn", "Profil", 145));
         historyDataGridView.Columns.Add(
             CreateTextColumn("printerColumn", "Drukarka", 160));
@@ -214,6 +216,7 @@ public partial class HistoryForm : Form
                 localTimestamp.ToString("g", CultureInfo.CurrentCulture),
                 $"{snapshot.FirstAssetId} – {snapshot.LastAssetId}",
                 snapshot.SmallLabelQuantity,
+                FormatOrganizationName(snapshot.OrganizationProfileName),
                 snapshot.ProfileName,
                 snapshot.PrinterName,
                 snapshot.CompanyName);
@@ -251,6 +254,10 @@ public partial class HistoryForm : Form
         details.AppendLine($"Czas lokalny: {localTimestamp:yyyy-MM-dd HH:mm:ss zzz}");
         details.AppendLine($"Czas UTC: {entry.TimestampUtc:O}");
         details.AppendLine($"Wersja aplikacji: {entry.ApplicationVersion}");
+        details.AppendLine(
+            $"Organizacja: {FormatOrganizationName(snapshot.OrganizationProfileName)}");
+        details.AppendLine(
+            $"ID organizacji: {FormatOrganizationName(snapshot.OrganizationProfileId)}");
         details.AppendLine();
         details.AppendLine("ASSET ID");
         details.AppendLine($"Zakres: {snapshot.FirstAssetId} – {snapshot.LastAssetId}");
@@ -280,5 +287,10 @@ public partial class HistoryForm : Form
     private static string FormatBoolean(bool value)
     {
         return value ? "Tak" : "Nie";
+    }
+
+    private static string FormatOrganizationName(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? "—" : value;
     }
 }

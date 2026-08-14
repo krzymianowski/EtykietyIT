@@ -12,6 +12,7 @@ public sealed class AppServices
         AppDataPaths dataPaths,
         JsonFileStore jsonFileStore,
         SettingsService settingsService,
+        OrganizationProfileService organizationProfileService,
         PrinterCalibrationService printerCalibrationService,
         LabelProfileService labelProfileService,
         PrintHistoryService printHistoryService,
@@ -22,6 +23,8 @@ public sealed class AppServices
         JsonFileStore = jsonFileStore ?? throw new ArgumentNullException(nameof(jsonFileStore));
         SettingsService = settingsService ??
             throw new ArgumentNullException(nameof(settingsService));
+        OrganizationProfileService = organizationProfileService ??
+            throw new ArgumentNullException(nameof(organizationProfileService));
         PrinterCalibrationService = printerCalibrationService ??
             throw new ArgumentNullException(nameof(printerCalibrationService));
         LabelProfileService = labelProfileService ??
@@ -39,6 +42,8 @@ public sealed class AppServices
     public JsonFileStore JsonFileStore { get; }
 
     public SettingsService SettingsService { get; }
+
+    public OrganizationProfileService OrganizationProfileService { get; }
 
     public PrinterCalibrationService PrinterCalibrationService { get; }
 

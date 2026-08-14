@@ -9,57 +9,74 @@ namespace EtykietyIT.Tests.Services;
 public sealed class SettingsServiceTests
 {
     [TestMethod]
-    public async Task LoadAsync_CreatesDefaultSettings_WhenFileDoesNotExist()
+    public async Task LoadAsync_CreatesNeutralOrganizationForFreshInstallation()
     {
-        string directoryPath = CreateTemporaryDirectory();
-        string filePath = Path.Combine(directoryPath, "settings.json");
-
-        try
+        await WithServicesAsync(async (settingsService, organizationService, paths) =>
         {
-            var service = new SettingsService(new JsonFileStore(), filePath);
+            ApplicationSettings settings = await settingsService.LoadAsync();
+            OrganizationProfile profile =
+                (await organizationService.GetByIdAsync(
+                    settings.ActiveOrganizationProfileId))!;
 
-            ApplicationSettings settings = await service.LoadAsync();
-
-            Assert.AreEqual(new ApplicationSettings(), settings);
-            Assert.IsTrue(File.Exists(filePath));
-        }
-        finally
-        {
-            Directory.Delete(directoryPath, true);
-        }
+            Assert.AreEqual(2, settings.SchemaVersion);
+            Assert.AreEqual("Domyślna organizacja", profile.Name);
+            Assert.AreEqual("Moja firma", profile.CompanyName);
+            Assert.AreEqual("IT-", profile.AssetId.Prefix);
+            Assert.AreEqual(6, profile.AssetId.Digits);
+            Assert.AreEqual(1, profile.NextAssetNumber);
+            Assert.AreEqual("builtin.89x41.2up", profile.DefaultLabelProfileId);
+            Assert.IsNull(profile.DefaultPrinterName);
+            Assert.IsTrue(File.Exists(paths.SettingsFilePath));
+            Assert.HasCount(
+                1,
+                Directory.GetFiles(paths.OrganizationsDirectory, "organization.*.json"));
+        });
     }
 
     [TestMethod]
-    public async Task SaveAndLoadAsync_RoundTripsSettings()
+    public async Task SaveAndLoadAsync_RoundTripsActiveOrganizationId()
     {
-        string directoryPath = CreateTemporaryDirectory();
-        string filePath = Path.Combine(directoryPath, "settings.json");
+        await WithServicesAsync(async (settingsService, organizationService, _) =>
+        {
+            OrganizationProfile first = await organizationService.CreateAsync(
+                new OrganizationProfile { Name = "Pierwsza" });
+            OrganizationProfile second = await organizationService.CreateAsync(
+                new OrganizationProfile { Name = "Druga" });
+            var expected = new ApplicationSettings
+            {
+                ActiveOrganizationProfileId = second.Id
+            };
+
+            await settingsService.SaveAsync(expected);
+            ApplicationSettings actual = await settingsService.LoadAsync();
+
+            Assert.AreEqual(expected, actual);
+            Assert.AreNotEqual(first.Id, actual.ActiveOrganizationProfileId);
+        });
+    }
+
+    private static async Task WithServicesAsync(
+        Func<SettingsService, OrganizationProfileService, TestPaths, Task> test)
+    {
+        string rootDirectory = CreateTemporaryDirectory();
+        var paths = new TestPaths(rootDirectory);
 
         try
         {
             var store = new JsonFileStore();
-            var service = new SettingsService(store, filePath);
-            var expected = new ApplicationSettings
-            {
-                CompanyName = "Przykładowa Firma S.A.",
-                AssetId = new AssetIdSettings
-                {
-                    Prefix = "ASSET-",
-                    Digits = 8
-                },
-                DefaultPrinterName = "DYMO LabelWriter 550",
-                NextAssetNumber = 123
-            };
-
-            await service.SaveAsync(expected);
-            var reloadedService = new SettingsService(new JsonFileStore(), filePath);
-            ApplicationSettings actual = await reloadedService.LoadAsync();
-
-            Assert.AreEqual(expected, actual);
+            var organizationService = new OrganizationProfileService(
+                store,
+                paths.OrganizationsDirectory);
+            var settingsService = new SettingsService(
+                store,
+                paths.SettingsFilePath,
+                paths.BackupFilePath,
+                organizationService);
+            await test(settingsService, organizationService, paths);
         }
         finally
         {
-            Directory.Delete(directoryPath, true);
+            Directory.Delete(rootDirectory, true);
         }
     }
 
@@ -70,5 +87,17 @@ public sealed class SettingsServiceTests
             $"EtykietyIT.Tests.{Guid.NewGuid():N}");
         Directory.CreateDirectory(directoryPath);
         return directoryPath;
+    }
+
+    private sealed record TestPaths(string RootDirectory)
+    {
+        public string SettingsFilePath { get; } =
+            Path.Combine(RootDirectory, "settings.json");
+
+        public string BackupFilePath { get; } =
+            Path.Combine(RootDirectory, "settings.v1.backup.json");
+
+        public string OrganizationsDirectory { get; } =
+            Path.Combine(RootDirectory, "organizations");
     }
 }

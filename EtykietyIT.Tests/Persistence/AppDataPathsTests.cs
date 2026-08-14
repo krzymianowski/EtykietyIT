@@ -47,6 +47,12 @@ public sealed class AppDataPathsTests
             Path.Combine(paths.RootDirectory, "profiles"),
             paths.ProfilesDirectory);
         Assert.AreEqual(
+            Path.Combine(paths.RootDirectory, "organizations"),
+            paths.OrganizationsDirectory);
+        Assert.AreEqual(
+            Path.Combine(paths.RootDirectory, "settings.v1.backup.json"),
+            paths.SettingsV1BackupFilePath);
+        Assert.AreEqual(
             Path.Combine(paths.RootDirectory, "history", "print-history.jsonl"),
             paths.HistoryFilePath);
         Assert.IsFalse(Directory.Exists(paths.RootDirectory));

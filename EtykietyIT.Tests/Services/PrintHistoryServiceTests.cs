@@ -162,6 +162,55 @@ public sealed class PrintHistoryServiceTests
         Assert.IsFalse(PrintHistorySearch.Matches(entry, "IT-000130"));
     }
 
+    [TestMethod]
+    public async Task AppendAsync_RoundTripsOrganizationSnapshotForNewEntry()
+    {
+        await WithHistoryFileAsync(async (service, _) =>
+        {
+            PrintHistoryEntry original = CreateEntry(1, 1);
+            PrintHistoryEntry entry = original with
+            {
+                Snapshot = original.Snapshot with
+                {
+                    OrganizationProfileId =
+                        "organization.3a271df1-99e5-4fa5-bf37-27f323370c42",
+                    OrganizationProfileName = "Oddział Wrocław"
+                }
+            };
+
+            await service.AppendAsync(entry);
+            PrintHistorySnapshot snapshot = (await service.ReadAllAsync())
+                .Entries
+                .Single()
+                .Snapshot;
+
+            Assert.AreEqual(
+                entry.Snapshot.OrganizationProfileId,
+                snapshot.OrganizationProfileId);
+            Assert.AreEqual("Oddział Wrocław", snapshot.OrganizationProfileName);
+        });
+    }
+
+    [TestMethod]
+    public async Task ReadAllAsync_ReadsLegacyLineWithoutOrganizationFields()
+    {
+        await WithHistoryFileAsync(async (service, filePath) =>
+        {
+            const string legacyLine = """
+                {"schemaVersion":1,"id":"9d025a9d-d26e-4fc9-a47d-af83be0bdf52","timestampUtc":"2026-08-14T10:00:00+00:00","applicationVersion":"3.0.0","snapshot":{"startNumber":1,"endNumber":2,"firstAssetId":"IT-000001","lastAssetId":"IT-000002","prefix":"IT-","digits":6,"companyName":"Stara firma","printerName":"DYMO LabelWriter 450","offsetXmm":0.0,"offsetYmm":0.0,"profileId":"builtin.89x41.2up","profileName":"89 × 41 mm — 2 etykiety","widthMm":89.0,"heightMm":41.0,"columns":2,"rows":1,"drawCutLines":true,"smallLabelQuantity":2,"physicalLabelQuantity":1,"qrEnabled":false}}
+                """;
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+            await File.WriteAllTextAsync(filePath, $"{legacyLine}\n");
+
+            PrintHistoryReadResult result = await service.ReadAllAsync();
+
+            Assert.HasCount(1, result.Entries);
+            Assert.AreEqual(0, result.SkippedRecordCount);
+            Assert.IsNull(result.Entries[0].Snapshot.OrganizationProfileId);
+            Assert.IsNull(result.Entries[0].Snapshot.OrganizationProfileName);
+        });
+    }
+
     private static PrintHistoryEntry CreateEntry(
         int startNumber,
         int quantity,

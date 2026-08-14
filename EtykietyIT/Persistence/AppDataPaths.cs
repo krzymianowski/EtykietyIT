@@ -8,10 +8,14 @@ public sealed class AppDataPaths
     {
         RootDirectory = rootDirectory;
         SettingsFilePath = Path.Combine(rootDirectory, "settings.json");
+        SettingsV1BackupFilePath = Path.Combine(
+            rootDirectory,
+            "settings.v1.backup.json");
         PrinterCalibrationsFilePath = Path.Combine(
             rootDirectory,
             "printer-calibrations.json");
         ProfilesDirectory = Path.Combine(rootDirectory, "profiles");
+        OrganizationsDirectory = Path.Combine(rootDirectory, "organizations");
         HistoryDirectory = Path.Combine(rootDirectory, "history");
         HistoryFilePath = Path.Combine(HistoryDirectory, "print-history.jsonl");
     }
@@ -20,9 +24,13 @@ public sealed class AppDataPaths
 
     public string SettingsFilePath { get; }
 
+    public string SettingsV1BackupFilePath { get; }
+
     public string PrinterCalibrationsFilePath { get; }
 
     public string ProfilesDirectory { get; }
+
+    public string OrganizationsDirectory { get; }
 
     public string HistoryDirectory { get; }
 

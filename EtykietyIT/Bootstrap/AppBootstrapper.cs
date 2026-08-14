@@ -26,9 +26,14 @@ public sealed class AppBootstrapper
         EnsureDataDirectoryIsWritable(dataPaths.RootDirectory, mode);
 
         var jsonFileStore = new JsonFileStore();
+        var organizationProfileService = new OrganizationProfileService(
+            jsonFileStore,
+            dataPaths.OrganizationsDirectory);
         var settingsService = new SettingsService(
             jsonFileStore,
-            dataPaths.SettingsFilePath);
+            dataPaths.SettingsFilePath,
+            dataPaths.SettingsV1BackupFilePath,
+            organizationProfileService);
         var printerCalibrationService = new PrinterCalibrationService(
             jsonFileStore,
             dataPaths.PrinterCalibrationsFilePath);
@@ -45,6 +50,7 @@ public sealed class AppBootstrapper
             dataPaths,
             jsonFileStore,
             settingsService,
+            organizationProfileService,
             printerCalibrationService,
             labelProfileService,
             printHistoryService,
@@ -55,6 +61,7 @@ public sealed class AppBootstrapper
     {
         Directory.CreateDirectory(dataPaths.RootDirectory);
         Directory.CreateDirectory(dataPaths.ProfilesDirectory);
+        Directory.CreateDirectory(dataPaths.OrganizationsDirectory);
         Directory.CreateDirectory(dataPaths.HistoryDirectory);
     }
 

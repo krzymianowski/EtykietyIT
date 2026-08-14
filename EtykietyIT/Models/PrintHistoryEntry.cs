@@ -48,6 +48,10 @@ public sealed record PrintHistoryEntry
 
 public sealed record PrintHistorySnapshot
 {
+    public string? OrganizationProfileId { get; init; }
+
+    public string? OrganizationProfileName { get; init; }
+
     public int StartNumber { get; init; }
 
     public int EndNumber { get; init; }
@@ -90,6 +94,23 @@ public sealed record PrintHistorySnapshot
 
     public void Validate()
     {
+        bool hasOrganizationId = !string.IsNullOrWhiteSpace(
+            OrganizationProfileId);
+        bool hasOrganizationName = !string.IsNullOrWhiteSpace(
+            OrganizationProfileName);
+        if (hasOrganizationId != hasOrganizationName)
+        {
+            throw new InvalidOperationException(
+                "Snapshot historii musi zawierać oba pola organizacji albo żadnego.");
+        }
+
+        if (hasOrganizationId &&
+            !OrganizationProfile.IsValidId(OrganizationProfileId))
+        {
+            throw new InvalidOperationException(
+                "Snapshot historii zawiera nieprawidłowy identyfikator organizacji.");
+        }
+
         if (string.IsNullOrWhiteSpace(PrinterName) ||
             string.IsNullOrWhiteSpace(CompanyName) ||
             string.IsNullOrWhiteSpace(Prefix) ||

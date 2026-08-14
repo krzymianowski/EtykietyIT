@@ -2,30 +2,30 @@ using EtykietyIT.Models;
 
 namespace EtykietyIT.Forms;
 
-public partial class SettingsForm : Form
+internal partial class SettingsForm : Form
 {
     private const string AutomaticPrinterItem = "(wybór automatyczny)";
 
-    private readonly ApplicationSettings _originalSettings;
+    private readonly OrganizationProfile _originalProfile;
 
     public SettingsForm(
-        ApplicationSettings settings,
+        OrganizationProfile profile,
         IEnumerable<string> installedPrinters)
     {
-        ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(profile);
         ArgumentNullException.ThrowIfNull(installedPrinters);
-        settings.Validate();
+        profile.Validate();
 
-        _originalSettings = settings;
-        Settings = settings;
+        _originalProfile = profile;
+        Profile = profile;
 
         InitializeComponent();
 
-        companyNameTextBox.Text = settings.CompanyName;
-        assetIdPrefixTextBox.Text = settings.AssetId.Prefix;
+        companyNameTextBox.Text = profile.CompanyName;
+        assetIdPrefixTextBox.Text = profile.AssetId.Prefix;
         assetIdDigitsNumericUpDown.Minimum = AssetIdSettings.MinimumDigits;
         assetIdDigitsNumericUpDown.Maximum = AssetIdSettings.MaximumDigits;
-        assetIdDigitsNumericUpDown.Value = settings.AssetId.Digits;
+        assetIdDigitsNumericUpDown.Value = profile.AssetId.Digits;
 
         defaultPrinterComboBox.Items.Add(AutomaticPrinterItem);
         foreach (string printerName in installedPrinters)
@@ -33,13 +33,13 @@ public partial class SettingsForm : Form
             defaultPrinterComboBox.Items.Add(printerName);
         }
 
-        SelectCurrentDefaultPrinter(settings.DefaultPrinterName);
+        SelectCurrentDefaultPrinter(profile.DefaultPrinterName);
 
         saveButton.Click += SaveButton_Click;
         cancelButton.Click += CancelButton_Click;
     }
 
-    public ApplicationSettings Settings { get; private set; }
+    public OrganizationProfile Profile { get; private set; }
 
     private void SelectCurrentDefaultPrinter(string? defaultPrinterName)
     {
@@ -72,7 +72,7 @@ public partial class SettingsForm : Form
             ? defaultPrinterComboBox.SelectedItem as string
             : null;
 
-        var updatedSettings = _originalSettings with
+        var updatedProfile = _originalProfile with
         {
             CompanyName = companyNameTextBox.Text.Trim(),
             AssetId = new AssetIdSettings
@@ -85,8 +85,8 @@ public partial class SettingsForm : Form
 
         try
         {
-            updatedSettings.Validate();
-            Settings = updatedSettings;
+            updatedProfile.Validate();
+            Profile = updatedProfile;
             DialogResult = DialogResult.OK;
             Close();
         }

@@ -15,17 +15,40 @@ Plik `settings.json` zawiera jeden `ApplicationSettings`.
 
 ```json
 {
+  "schemaVersion": 2,
+  "activeOrganizationProfileId": "organization.3a271df1-99e5-4fa5-bf37-27f323370c42"
+}
+```
+
+Ustawienia globalne nie przechowują trybu Standard/Portable ani danych firmy.
+Plik `settings.v1.backup.json` jest tworzony tylko podczas migracji ustawień v1.
+
+## Profile organizacji
+
+Każda organizacja znajduje się w osobnym pliku:
+
+```text
+organizations/organization.<guid>.json
+```
+
+```json
+{
   "schemaVersion": 1,
+  "id": "organization.3a271df1-99e5-4fa5-bf37-27f323370c42",
+  "name": "Dolnośląskie Młyny",
   "companyName": "Dolnośląskie Młyny S.A.",
   "assetId": {
     "prefix": "IT-",
     "digits": 6
   },
-  "defaultPrinterName": "DYMO LabelWriter 550",
-  "defaultProfileId": "builtin.89x41.2up",
-  "nextAssetNumber": 11
+  "nextAssetNumber": 24,
+  "defaultLabelProfileId": "builtin.89x41.2up",
+  "defaultPrinterName": "DYMO LabelWriter 550"
 }
 ```
+
+Nazwy organizacji są unikalne bez rozróżniania wielkości liter. Kalibracje
+drukarek nie są częścią tego dokumentu.
 
 ## Kalibracje drukarek
 
@@ -104,4 +127,7 @@ Wpis jest tworzony wyłącznie po bezbłędnym zakończeniu
 a nie potwierdzenie fizycznego wydruku.
 
 Snapshot zachowuje m.in. drukarkę, kalibrację, firmę, format Asset ID, zakres,
-profil wraz z geometrią oraz liczbę małych i fizycznych etykiet.
+profil wraz z geometrią oraz liczbę małych i fizycznych etykiet. Nowe wpisy
+zawierają także `organizationProfileId` i `organizationProfileName`. Pola te są
+opcjonalne przy odczycie, aby wpisy zapisane przed wprowadzeniem organizacji
+pozostały poprawne. Historia nie jest migrowana ani przepisywana.

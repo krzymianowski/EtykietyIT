@@ -16,7 +16,8 @@ public static class PrintHistorySearch
         }
 
         PrintHistorySnapshot snapshot = entry.Snapshot;
-        if (Contains(snapshot.PrinterName, query) ||
+        if (Contains(snapshot.OrganizationProfileName, query) ||
+            Contains(snapshot.PrinterName, query) ||
             Contains(snapshot.ProfileName, query) ||
             Contains(snapshot.ProfileId, query) ||
             Contains(snapshot.CompanyName, query) ||
@@ -50,8 +51,10 @@ public static class PrintHistorySearch
             out assetNumber);
     }
 
-    private static bool Contains(string value, string query)
+    private static bool Contains(string? value, string query)
     {
-        return value.Contains(query, StringComparison.CurrentCultureIgnoreCase);
+        return value?.Contains(
+            query,
+            StringComparison.CurrentCultureIgnoreCase) == true;
     }
 }

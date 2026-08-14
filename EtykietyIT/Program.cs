@@ -21,6 +21,7 @@ static class Program
 
             Application.Run(new Form1(
                 services.SettingsService,
+                services.OrganizationProfileService,
                 services.PrinterCalibrationService,
                 services.LabelProfileService,
                 services.PrintHistoryService,
