@@ -1,0 +1,23 @@
+using EtykietyIT.Models;
+using EtykietyIT.Persistence;
+
+namespace EtykietyIT.Bootstrap;
+
+public sealed class AppServices
+{
+    public AppServices(
+        ApplicationMode applicationMode,
+        AppDataPaths dataPaths,
+        JsonFileStore jsonFileStore)
+    {
+        ApplicationMode = applicationMode;
+        DataPaths = dataPaths ?? throw new ArgumentNullException(nameof(dataPaths));
+        JsonFileStore = jsonFileStore ?? throw new ArgumentNullException(nameof(jsonFileStore));
+    }
+
+    public ApplicationMode ApplicationMode { get; }
+
+    public AppDataPaths DataPaths { get; }
+
+    public JsonFileStore JsonFileStore { get; }
+}
