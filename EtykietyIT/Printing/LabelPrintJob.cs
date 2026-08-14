@@ -169,7 +169,7 @@ public sealed class LabelPrintJob : IDisposable
             pageHeight = (float)_options.HeightMm;
         }
 
-        bool isPreview = IsPreview(sender);
+        bool isPreview = _options.RenderMode == LabelRenderMode.Preview;
         float safeEdgeX;
         float safeEdgeY;
 
@@ -215,6 +215,16 @@ public sealed class LabelPrintJob : IDisposable
             safeEdgeY = Math.Max(1.0f, Math.Max(hardTop, hardBottom));
 
             graphics.TranslateTransform(-hardLeft, -hardTop);
+
+            PrinterCalibration calibration =
+                _options.Calibration ?? new PrinterCalibration();
+
+            if (calibration.OffsetXmm != 0.0 || calibration.OffsetYmm != 0.0)
+            {
+                graphics.TranslateTransform(
+                    (float)calibration.OffsetXmm,
+                    (float)calibration.OffsetYmm);
+            }
         }
 
         float cellWidth = pageWidth / _options.Columns;
@@ -410,24 +420,5 @@ public sealed class LabelPrintJob : IDisposable
         }
 
         return new Font(fontName, minPt, style);
-    }
-
-    private static bool IsPreview(object? sender)
-    {
-        try
-        {
-            if (sender is PrintDocument printDocument)
-            {
-                string controllerName = printDocument.PrintController.GetType().Name;
-                return controllerName.Contains(
-                    "Preview",
-                    StringComparison.OrdinalIgnoreCase);
-            }
-        }
-        catch
-        {
-        }
-
-        return false;
     }
 }

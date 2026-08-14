@@ -73,10 +73,16 @@ public partial class Form1 : Form
 
         int startNumber = decimal.ToInt32(firstNumberNumericUpDown.Value);
         int quantity = decimal.ToInt32(quantityNumericUpDown.Value);
+        PrinterCalibration calibration = GetPrinterCalibration();
 
         try
         {
-            using var printJob = CreatePrintJob(printerName, startNumber, quantity);
+            using var printJob = CreatePrintJob(
+                printerName,
+                startNumber,
+                quantity,
+                calibration,
+                LabelRenderMode.Preview);
             using var previewDialog = new PrintPreviewDialog
             {
                 Document = printJob.Document,
@@ -106,6 +112,7 @@ public partial class Form1 : Form
         int quantity = decimal.ToInt32(quantityNumericUpDown.Value);
         int endNumber = startNumber + quantity - 1;
         int slotsPerPhysicalLabel = LabelColumns * LabelRows;
+        PrinterCalibration calibration = GetPrinterCalibration();
         int physicalLabels = (int)Math.Ceiling(
             quantity / (double)slotsPerPhysicalLabel);
 
@@ -131,7 +138,12 @@ public partial class Form1 : Form
 
         try
         {
-            using var printJob = CreatePrintJob(printerName, startNumber, quantity);
+            using var printJob = CreatePrintJob(
+                printerName,
+                startNumber,
+                quantity,
+                calibration,
+                LabelRenderMode.Print);
             printJob.Document.Print();
 
             firstNumberNumericUpDown.Value = endNumber + 1;
@@ -145,7 +157,9 @@ public partial class Form1 : Form
     private static LabelPrintJob CreatePrintJob(
         string printerName,
         int startNumber,
-        int quantity)
+        int quantity,
+        PrinterCalibration calibration,
+        LabelRenderMode renderMode)
     {
         var options = new LabelPrintOptions(
             printerName,
@@ -155,9 +169,18 @@ public partial class Form1 : Form
             LabelHeightMm,
             LabelColumns,
             LabelRows,
-            DrawCutLines);
+            DrawCutLines,
+            calibration,
+            renderMode);
 
         return new LabelPrintJob(options);
+    }
+
+    private PrinterCalibration GetPrinterCalibration()
+    {
+        return new PrinterCalibration(
+            decimal.ToDouble(calibrationXNumericUpDown.Value),
+            decimal.ToDouble(calibrationYNumericUpDown.Value));
     }
 
     private string? GetSelectedPrinterName()

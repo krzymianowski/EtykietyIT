@@ -8,4 +8,6 @@ public sealed record LabelPrintOptions(
     double HeightMm,
     int Columns,
     int Rows,
-    bool DrawCutLines);
+    bool DrawCutLines,
+    PrinterCalibration? Calibration = null,
+    LabelRenderMode RenderMode = LabelRenderMode.Print);

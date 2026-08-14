@@ -37,10 +37,16 @@ partial class Form1
         quantityNumericUpDown = new NumericUpDown();
         assetRangePromptLabel = new Label();
         assetRangeLabel = new Label();
+        calibrationXPromptLabel = new Label();
+        calibrationXNumericUpDown = new NumericUpDown();
+        calibrationYPromptLabel = new Label();
+        calibrationYNumericUpDown = new NumericUpDown();
         previewButton = new Button();
         printButton = new Button();
         ((System.ComponentModel.ISupportInitialize)firstNumberNumericUpDown).BeginInit();
         ((System.ComponentModel.ISupportInitialize)quantityNumericUpDown).BeginInit();
+        ((System.ComponentModel.ISupportInitialize)calibrationXNumericUpDown).BeginInit();
+        ((System.ComponentModel.ISupportInitialize)calibrationYNumericUpDown).BeginInit();
         SuspendLayout();
         //
         // printerPromptLabel
@@ -118,30 +124,74 @@ partial class Form1
         assetRangeLabel.TabIndex = 7;
         assetRangeLabel.Text = "IT-000011 – IT-000012";
         //
+        // calibrationXPromptLabel
+        //
+        calibrationXPromptLabel.AutoSize = true;
+        calibrationXPromptLabel.Location = new Point(24, 199);
+        calibrationXPromptLabel.Name = "calibrationXPromptLabel";
+        calibrationXPromptLabel.Size = new Size(92, 15);
+        calibrationXPromptLabel.TabIndex = 8;
+        calibrationXPromptLabel.Text = "Korekta X [mm]:";
+        //
+        // calibrationXNumericUpDown
+        //
+        calibrationXNumericUpDown.DecimalPlaces = 1;
+        calibrationXNumericUpDown.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+        calibrationXNumericUpDown.Location = new Point(145, 195);
+        calibrationXNumericUpDown.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+        calibrationXNumericUpDown.Minimum = new decimal(new int[] { 10, 0, 0, int.MinValue });
+        calibrationXNumericUpDown.Name = "calibrationXNumericUpDown";
+        calibrationXNumericUpDown.Size = new Size(130, 23);
+        calibrationXNumericUpDown.TabIndex = 9;
+        //
+        // calibrationYPromptLabel
+        //
+        calibrationYPromptLabel.AutoSize = true;
+        calibrationYPromptLabel.Location = new Point(24, 238);
+        calibrationYPromptLabel.Name = "calibrationYPromptLabel";
+        calibrationYPromptLabel.Size = new Size(92, 15);
+        calibrationYPromptLabel.TabIndex = 10;
+        calibrationYPromptLabel.Text = "Korekta Y [mm]:";
+        //
+        // calibrationYNumericUpDown
+        //
+        calibrationYNumericUpDown.DecimalPlaces = 1;
+        calibrationYNumericUpDown.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+        calibrationYNumericUpDown.Location = new Point(145, 234);
+        calibrationYNumericUpDown.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+        calibrationYNumericUpDown.Minimum = new decimal(new int[] { 10, 0, 0, int.MinValue });
+        calibrationYNumericUpDown.Name = "calibrationYNumericUpDown";
+        calibrationYNumericUpDown.Size = new Size(130, 23);
+        calibrationYNumericUpDown.TabIndex = 11;
+        //
         // previewButton
         //
-        previewButton.Location = new Point(287, 198);
+        previewButton.Location = new Point(287, 282);
         previewButton.Name = "previewButton";
         previewButton.Size = new Size(95, 34);
-        previewButton.TabIndex = 8;
+        previewButton.TabIndex = 12;
         previewButton.Text = "Podgląd";
         previewButton.UseVisualStyleBackColor = true;
         //
         // printButton
         //
-        printButton.Location = new Point(395, 198);
+        printButton.Location = new Point(395, 282);
         printButton.Name = "printButton";
         printButton.Size = new Size(95, 34);
-        printButton.TabIndex = 9;
+        printButton.TabIndex = 13;
         printButton.Text = "Drukuj";
         printButton.UseVisualStyleBackColor = true;
         //
         // Form1
         //
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size(519, 256);
+        ClientSize = new Size(519, 340);
         Controls.Add(printButton);
         Controls.Add(previewButton);
+        Controls.Add(calibrationYNumericUpDown);
+        Controls.Add(calibrationYPromptLabel);
+        Controls.Add(calibrationXNumericUpDown);
+        Controls.Add(calibrationXPromptLabel);
         Controls.Add(assetRangeLabel);
         Controls.Add(assetRangePromptLabel);
         Controls.Add(quantityNumericUpDown);
@@ -157,6 +207,8 @@ partial class Form1
         Text = "Etykiety IT — test drukowania";
         ((System.ComponentModel.ISupportInitialize)firstNumberNumericUpDown).EndInit();
         ((System.ComponentModel.ISupportInitialize)quantityNumericUpDown).EndInit();
+        ((System.ComponentModel.ISupportInitialize)calibrationXNumericUpDown).EndInit();
+        ((System.ComponentModel.ISupportInitialize)calibrationYNumericUpDown).EndInit();
         ResumeLayout(false);
         PerformLayout();
     }
@@ -171,6 +223,10 @@ partial class Form1
     private NumericUpDown quantityNumericUpDown;
     private Label assetRangePromptLabel;
     private Label assetRangeLabel;
+    private Label calibrationXPromptLabel;
+    private NumericUpDown calibrationXNumericUpDown;
+    private Label calibrationYPromptLabel;
+    private NumericUpDown calibrationYNumericUpDown;
     private Button previewButton;
     private Button printButton;
 }
