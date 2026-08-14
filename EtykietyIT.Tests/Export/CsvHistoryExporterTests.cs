@@ -20,6 +20,8 @@ public sealed class CsvHistoryExporterTests
         "Numer końcowy",
         "Liczba małych etykiet",
         "Liczba fizycznych etykiet",
+        "ID organizacji",
+        "Organizacja",
         "Firma",
         "Prefiks",
         "Liczba cyfr",
@@ -62,14 +64,76 @@ public sealed class CsvHistoryExporterTests
             string[][] rows = ReadLines(filePath).Select(ParseRow).ToArray();
 
             Assert.HasCount(2, rows);
-            Assert.HasCount(24, rows[1]);
+            Assert.HasCount(26, rows[1]);
             Assert.AreEqual(entry.Id.ToString("D"), rows[1][0]);
             Assert.AreEqual("IT-000123", rows[1][4]);
             Assert.AreEqual("IT-000126", rows[1][5]);
             Assert.AreEqual("4", rows[1][8]);
             Assert.AreEqual("2", rows[1][9]);
-            Assert.AreEqual("Tak", rows[1][22]);
-            Assert.AreEqual("Nie", rows[1][23]);
+            Assert.AreEqual(string.Empty, rows[1][10]);
+            Assert.AreEqual("—", rows[1][11]);
+            Assert.AreEqual("Tak", rows[1][24]);
+            Assert.AreEqual("Nie", rows[1][25]);
+        });
+    }
+
+    [TestMethod]
+    public async Task ExportAsync_WritesOrganizationInformation()
+    {
+        await WithExportFileAsync(async filePath =>
+        {
+            const string organizationId =
+                "organization.3a271df1-99e5-4fa5-bf37-27f323370c42";
+            const string organizationName = "Oddział Łódź";
+            PrintHistoryEntry entry = WithOrganization(
+                CreateEntry(123, 1),
+                organizationId,
+                organizationName);
+
+            await new CsvHistoryExporter().ExportAsync(new[] { entry }, filePath);
+            string[] values = ParseRow(ReadLines(filePath)[1]);
+
+            Assert.AreEqual(organizationId, values[10]);
+            Assert.AreEqual(organizationName, values[11]);
+        });
+    }
+
+    [TestMethod]
+    public async Task ExportAsync_WritesLegacyEntryWithoutOrganization()
+    {
+        await WithExportFileAsync(async filePath =>
+        {
+            PrintHistoryEntry legacyEntry = CreateEntry(123, 1);
+
+            await new CsvHistoryExporter().ExportAsync(
+                new[] { legacyEntry },
+                filePath);
+            string[] values = ParseRow(ReadLines(filePath)[1]);
+
+            Assert.AreEqual(string.Empty, values[10]);
+            Assert.AreEqual("—", values[11]);
+        });
+    }
+
+    [TestMethod]
+    public async Task ExportAsync_EscapesSemicolonsAndQuotesInOrganizationName()
+    {
+        await WithExportFileAsync(async filePath =>
+        {
+            const string organizationName = "Oddział; \"Północ — Łódź\"";
+            PrintHistoryEntry entry = WithOrganization(
+                CreateEntry(123, 1),
+                "organization.a08dc2ef-35b9-4812-99da-ec32d662c8b1",
+                organizationName);
+
+            await new CsvHistoryExporter().ExportAsync(new[] { entry }, filePath);
+            string dataLine = ReadLines(filePath)[1];
+            string[] values = ParseRow(dataLine);
+
+            StringAssert.Contains(
+                dataLine,
+                "\"Oddział; \"\"Północ — Łódź\"\"\"");
+            Assert.AreEqual(organizationName, values[11]);
         });
     }
 
@@ -145,8 +209,8 @@ public sealed class CsvHistoryExporterTests
 
             StringAssert.Contains(dataLine, "\"Firma; \"\"Polska\"\" S.A.\"");
             StringAssert.Contains(dataLine, "\"Profil; \"\"Specjalny\"\"\"");
-            Assert.AreEqual(entry.Snapshot.CompanyName, values[10]);
-            Assert.AreEqual(entry.Snapshot.ProfileName, values[17]);
+            Assert.AreEqual(entry.Snapshot.CompanyName, values[12]);
+            Assert.AreEqual(entry.Snapshot.ProfileName, values[19]);
         });
     }
 
@@ -168,8 +232,8 @@ public sealed class CsvHistoryExporterTests
             await new CsvHistoryExporter().ExportAsync(new[] { entry }, filePath);
             string[] values = ParseRow(ReadLines(filePath)[1]);
 
-            Assert.AreEqual("-0,4", values[14]);
-            Assert.AreEqual("1,25", values[15]);
+            Assert.AreEqual("-0,4", values[16]);
+            Assert.AreEqual("1,25", values[17]);
         });
     }
 
@@ -244,6 +308,21 @@ public sealed class CsvHistoryExporterTests
                 SmallLabelQuantity = quantity,
                 PhysicalLabelQuantity = (int)Math.Ceiling(quantity / 2.0),
                 QrEnabled = false
+            }
+        };
+    }
+
+    private static PrintHistoryEntry WithOrganization(
+        PrintHistoryEntry entry,
+        string organizationId,
+        string organizationName)
+    {
+        return entry with
+        {
+            Snapshot = entry.Snapshot with
+            {
+                OrganizationProfileId = organizationId,
+                OrganizationProfileName = organizationName
             }
         };
     }

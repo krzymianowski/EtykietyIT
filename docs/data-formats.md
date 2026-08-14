@@ -131,3 +131,13 @@ profil wraz z geometrią oraz liczbę małych i fizycznych etykiet. Nowe wpisy
 zawierają także `organizationProfileId` i `organizationProfileName`. Pola te są
 opcjonalne przy odczycie, aby wpisy zapisane przed wprowadzeniem organizacji
 pozostały poprawne. Historia nie jest migrowana ani przepisywana.
+
+## Eksport CSV historii
+
+Eksport historii jest zapisywany jako UTF-8 z BOM, z separatorem `;` i końcami
+linii CRLF. Kolumny `ID organizacji` oraz `Organizacja` znajdują się po danych
+zakresu i ilościach etykiet, a przed kolumną `Firma`.
+
+Dla wpisów utworzonych przed obsługą profili organizacji `ID organizacji`
+pozostaje puste, natomiast `Organizacja` ma wartość `—`. Rozszerzenie eksportu
+nie zmienia źródłowego formatu `print-history.jsonl` ani zapisanych wpisów.

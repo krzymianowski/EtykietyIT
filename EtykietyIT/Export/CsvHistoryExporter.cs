@@ -23,6 +23,8 @@ public sealed class CsvHistoryExporter : IHistoryExporter
         "Numer końcowy",
         "Liczba małych etykiet",
         "Liczba fizycznych etykiet",
+        "ID organizacji",
+        "Organizacja",
         "Firma",
         "Prefiks",
         "Liczba cyfr",
@@ -98,6 +100,10 @@ public sealed class CsvHistoryExporter : IHistoryExporter
             snapshot.EndNumber.ToString(CultureInfo.InvariantCulture),
             snapshot.SmallLabelQuantity.ToString(CultureInfo.InvariantCulture),
             snapshot.PhysicalLabelQuantity.ToString(CultureInfo.InvariantCulture),
+            snapshot.OrganizationProfileId ?? string.Empty,
+            string.IsNullOrWhiteSpace(snapshot.OrganizationProfileName)
+                ? "—"
+                : snapshot.OrganizationProfileName,
             snapshot.CompanyName,
             snapshot.Prefix,
             snapshot.Digits.ToString(CultureInfo.InvariantCulture),
