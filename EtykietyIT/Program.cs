@@ -23,6 +23,7 @@ static class Program
                 services.SettingsService,
                 services.PrinterCalibrationService,
                 services.LabelProfileService,
+                services.PrintHistoryService,
                 settings));
         }
         catch (Exception exception)

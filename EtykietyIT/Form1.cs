@@ -11,6 +11,7 @@ public partial class Form1 : Form
     private readonly SettingsService _settingsService;
     private readonly PrinterCalibrationService _printerCalibrationService;
     private readonly LabelProfileService _labelProfileService;
+    private readonly PrintHistoryService _printHistoryService;
 
     private ApplicationSettings _settings;
     private LabelProfile? _selectedProfile;
@@ -20,6 +21,7 @@ public partial class Form1 : Form
         SettingsService settingsService,
         PrinterCalibrationService printerCalibrationService,
         LabelProfileService labelProfileService,
+        PrintHistoryService printHistoryService,
         ApplicationSettings settings)
     {
         _settingsService = settingsService ??
@@ -28,6 +30,8 @@ public partial class Form1 : Form
             throw new ArgumentNullException(nameof(printerCalibrationService));
         _labelProfileService = labelProfileService ??
             throw new ArgumentNullException(nameof(labelProfileService));
+        _printHistoryService = printHistoryService ??
+            throw new ArgumentNullException(nameof(printHistoryService));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _settings.Validate();
 
@@ -39,6 +43,7 @@ public partial class Form1 : Form
         quantityNumericUpDown.ValueChanged += NumberInput_ValueChanged;
         settingsButton.Click += SettingsButton_Click;
         profilesButton.Click += ProfilesButton_Click;
+        historyButton.Click += HistoryButton_Click;
         saveCalibrationButton.Click += SaveCalibrationButton_Click;
         previewButton.Click += PreviewButton_Click;
         printButton.Click += PrintButton_Click;
@@ -204,6 +209,12 @@ public partial class Form1 : Form
         await ReloadProfilesAsync(preferredProfileId);
     }
 
+    private void HistoryButton_Click(object? sender, EventArgs e)
+    {
+        using var historyForm = new HistoryForm(_printHistoryService);
+        historyForm.ShowDialog(this);
+    }
+
     private async void SaveCalibrationButton_Click(object? sender, EventArgs e)
     {
         string? printerName = GetSelectedPrinterName();
@@ -320,6 +331,53 @@ public partial class Form1 : Form
         {
             ShowError($"Nie udało się wydrukować etykiet.\r\n\r\n{exception.Message}");
             return;
+        }
+
+        var historyEntry = new PrintHistoryEntry
+        {
+            Id = Guid.NewGuid(),
+            TimestampUtc = DateTimeOffset.UtcNow,
+            ApplicationVersion = Application.ProductVersion,
+            Snapshot = new PrintHistorySnapshot
+            {
+                StartNumber = startNumber,
+                EndNumber = endNumber,
+                FirstAssetId = FormatAssetId(startNumber),
+                LastAssetId = FormatAssetId(endNumber),
+                Prefix = _settings.AssetId.Prefix,
+                Digits = _settings.AssetId.Digits,
+                CompanyName = _settings.CompanyName,
+                PrinterName = printerName,
+                OffsetXmm = calibration.OffsetXmm,
+                OffsetYmm = calibration.OffsetYmm,
+                ProfileId = profile.Id,
+                ProfileName = profile.Name,
+                WidthMm = profile.WidthMm,
+                HeightMm = profile.HeightMm,
+                Columns = profile.Columns,
+                Rows = profile.Rows,
+                DrawCutLines = profile.DrawCutLines,
+                SmallLabelQuantity = quantity,
+                PhysicalLabelQuantity = physicalLabels,
+                QrEnabled = false
+            }
+        };
+
+        try
+        {
+            await _printHistoryService.AppendAsync(historyEntry);
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show(
+                this,
+                "Zadanie zostało przekazane do systemu drukowania Windows, " +
+                "ale nie udało się zapisać historii. Wydruk nie zostanie wysłany " +
+                "ponownie. Numeracja zostanie przesunięta, aby nie powtórzyć " +
+                $"wysłanego zakresu.\r\n\r\n{exception.Message}",
+                "Błąd zapisu historii",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning);
         }
 
         int nextAssetNumber = endNumber + 1;

@@ -48,14 +48,6 @@ public sealed record PrintHistoryEntry
 
 public sealed record PrintHistorySnapshot
 {
-    public string PrinterName { get; init; } = string.Empty;
-
-    public string CompanyName { get; init; } = string.Empty;
-
-    public string AssetIdPrefix { get; init; } = string.Empty;
-
-    public int AssetIdDigits { get; init; }
-
     public int StartNumber { get; init; }
 
     public int EndNumber { get; init; }
@@ -64,9 +56,17 @@ public sealed record PrintHistorySnapshot
 
     public string LastAssetId { get; init; } = string.Empty;
 
-    public int Quantity { get; init; }
+    public string Prefix { get; init; } = string.Empty;
 
-    public int PhysicalLabels { get; init; }
+    public int Digits { get; init; }
+
+    public string CompanyName { get; init; } = string.Empty;
+
+    public string PrinterName { get; init; } = string.Empty;
+
+    public double OffsetXmm { get; init; }
+
+    public double OffsetYmm { get; init; }
 
     public string ProfileId { get; init; } = string.Empty;
 
@@ -82,15 +82,17 @@ public sealed record PrintHistorySnapshot
 
     public bool DrawCutLines { get; init; }
 
-    public double CalibrationOffsetXmm { get; init; }
+    public int SmallLabelQuantity { get; init; }
 
-    public double CalibrationOffsetYmm { get; init; }
+    public int PhysicalLabelQuantity { get; init; }
+
+    public bool QrEnabled { get; init; }
 
     public void Validate()
     {
         if (string.IsNullOrWhiteSpace(PrinterName) ||
             string.IsNullOrWhiteSpace(CompanyName) ||
-            string.IsNullOrWhiteSpace(AssetIdPrefix) ||
+            string.IsNullOrWhiteSpace(Prefix) ||
             string.IsNullOrWhiteSpace(FirstAssetId) ||
             string.IsNullOrWhiteSpace(LastAssetId) ||
             string.IsNullOrWhiteSpace(ProfileId) ||
@@ -99,14 +101,22 @@ public sealed record PrintHistorySnapshot
             throw new InvalidOperationException("Snapshot wydruku zawiera brakujące dane tekstowe.");
         }
 
-        if (AssetIdDigits < 1 || StartNumber < 0 || EndNumber < StartNumber)
+        if (Digits is < AssetIdSettings.MinimumDigits or > AssetIdSettings.MaximumDigits ||
+            StartNumber < 0 || EndNumber < StartNumber)
         {
             throw new InvalidOperationException("Snapshot wydruku zawiera nieprawidłowy zakres Asset ID.");
         }
 
-        if (Quantity < 1 || PhysicalLabels < 1 || Columns < 1 || Rows < 1)
+        if (SmallLabelQuantity < 1 || PhysicalLabelQuantity < 1 ||
+            Columns < 1 || Rows < 1)
         {
             throw new InvalidOperationException("Snapshot wydruku zawiera nieprawidłową liczbę etykiet.");
+        }
+
+        if ((long)EndNumber - StartNumber + 1 != SmallLabelQuantity)
+        {
+            throw new InvalidOperationException(
+                "Liczba małych etykiet nie odpowiada zakresowi Asset ID.");
         }
 
         if (!double.IsFinite(WidthMm) || !double.IsFinite(HeightMm) ||
@@ -115,8 +125,7 @@ public sealed record PrintHistorySnapshot
             throw new InvalidOperationException("Snapshot wydruku zawiera nieprawidłowe wymiary.");
         }
 
-        if (!double.IsFinite(CalibrationOffsetXmm) ||
-            !double.IsFinite(CalibrationOffsetYmm))
+        if (!double.IsFinite(OffsetXmm) || !double.IsFinite(OffsetYmm))
         {
             throw new InvalidOperationException("Snapshot wydruku zawiera nieprawidłową kalibrację.");
         }

@@ -46,6 +46,7 @@ partial class Form1
         calibrationYNumericUpDown = new NumericUpDown();
         saveCalibrationButton = new Button();
         settingsButton = new Button();
+        historyButton = new Button();
         previewButton = new Button();
         printButton = new Button();
         ((System.ComponentModel.ISupportInitialize)firstNumberNumericUpDown).BeginInit();
@@ -214,6 +215,15 @@ partial class Form1
         settingsButton.Text = "Ustawienia";
         settingsButton.UseVisualStyleBackColor = true;
         //
+        // historyButton
+        //
+        historyButton.Location = new Point(145, 321);
+        historyButton.Name = "historyButton";
+        historyButton.Size = new Size(110, 34);
+        historyButton.TabIndex = 17;
+        historyButton.Text = "Historia...";
+        historyButton.UseVisualStyleBackColor = true;
+        //
         // previewButton
         //
         previewButton.Location = new Point(287, 321);
@@ -238,6 +248,7 @@ partial class Form1
         ClientSize = new Size(519, 379);
         Controls.Add(printButton);
         Controls.Add(previewButton);
+        Controls.Add(historyButton);
         Controls.Add(profilesButton);
         Controls.Add(settingsButton);
         Controls.Add(saveCalibrationButton);
@@ -287,6 +298,7 @@ partial class Form1
     private NumericUpDown calibrationYNumericUpDown;
     private Button saveCalibrationButton;
     private Button settingsButton;
+    private Button historyButton;
     private Button previewButton;
     private Button printButton;
 }

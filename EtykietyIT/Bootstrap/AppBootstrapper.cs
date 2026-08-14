@@ -35,6 +35,8 @@ public sealed class AppBootstrapper
             jsonFileStore,
             Path.Combine(executableDirectory, "Resources", "Profiles"),
             dataPaths.ProfilesDirectory);
+        var printHistoryService = new PrintHistoryService(
+            dataPaths.HistoryFilePath);
 
         return new AppServices(
             mode,
@@ -42,7 +44,8 @@ public sealed class AppBootstrapper
             jsonFileStore,
             settingsService,
             printerCalibrationService,
-            labelProfileService);
+            labelProfileService,
+            printHistoryService);
     }
 
     private static void CreateDataDirectories(AppDataPaths dataPaths)
