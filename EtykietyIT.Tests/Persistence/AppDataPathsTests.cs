@@ -55,6 +55,9 @@ public sealed class AppDataPathsTests
         Assert.AreEqual(
             Path.Combine(paths.RootDirectory, "history", "print-history.jsonl"),
             paths.HistoryFilePath);
+        Assert.AreEqual(
+            Path.Combine(paths.RootDirectory, "diagnostics"),
+            paths.DiagnosticsDirectory);
         Assert.IsFalse(Directory.Exists(paths.RootDirectory));
     }
 }

@@ -1,4 +1,5 @@
 using EtykietyIT.Bootstrap;
+using EtykietyIT.Diagnostics;
 using EtykietyIT.Models;
 
 namespace EtykietyIT;
@@ -14,12 +15,15 @@ static class Program
         {
             var bootstrapper = new AppBootstrapper();
             AppServices services = bootstrapper.Build(arguments);
+            using var uiDiagnostics = UiDiagnosticsService.StartIfRequested(
+                arguments,
+                services.DataPaths.DiagnosticsDirectory);
             ApplicationSettings settings = services.SettingsService
                 .LoadAsync()
                 .GetAwaiter()
                 .GetResult();
 
-            Application.Run(new Form1(
+            Application.Run(new MainForm(
                 services.SettingsService,
                 services.OrganizationProfileService,
                 services.PrinterCalibrationService,

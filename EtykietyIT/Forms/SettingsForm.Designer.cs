@@ -120,7 +120,8 @@ partial class SettingsForm
         // SettingsForm
         //
         AcceptButton = saveButton;
-        AutoScaleMode = AutoScaleMode.Font;
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
         CancelButton = cancelButton;
         ClientSize = new Size(468, 263);
         Controls.Add(cancelButton);

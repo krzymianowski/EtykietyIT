@@ -22,8 +22,18 @@ public partial class ProfilesForm : Form
         duplicateButton.Click += DuplicateButton_Click;
         deleteButton.Click += DeleteButton_Click;
         closeButton.Click += CloseButton_Click;
+        profilesListView.Resize += ProfilesListView_Resize;
 
         UpdateActionButtons();
+    }
+
+    private void ProfilesListView_Resize(object? sender, EventArgs e)
+    {
+        int fixedWidth = typeColumnHeader.Width + sizeColumnHeader.Width +
+            layoutColumnHeader.Width;
+        nameColumnHeader.Width = Math.Max(
+            200,
+            profilesListView.ClientSize.Width - fixedWidth - 8);
     }
 
     private async void ProfilesForm_Shown(object? sender, EventArgs e)

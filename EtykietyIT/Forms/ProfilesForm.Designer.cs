@@ -17,17 +17,35 @@ partial class ProfilesForm
     private void InitializeComponent()
     {
         components = new System.ComponentModel.Container();
+        mainLayoutPanel = new TableLayoutPanel();
         profilesListView = new ListView();
         nameColumnHeader = new ColumnHeader();
         typeColumnHeader = new ColumnHeader();
         sizeColumnHeader = new ColumnHeader();
         layoutColumnHeader = new ColumnHeader();
+        actionsLayoutPanel = new TableLayoutPanel();
+        editButtonsPanel = new FlowLayoutPanel();
         newButton = new Button();
         editButton = new Button();
         duplicateButton = new Button();
         deleteButton = new Button();
         closeButton = new Button();
+        mainLayoutPanel.SuspendLayout();
+        actionsLayoutPanel.SuspendLayout();
+        editButtonsPanel.SuspendLayout();
         SuspendLayout();
+        //
+        // mainLayoutPanel
+        //
+        mainLayoutPanel.ColumnCount = 1;
+        mainLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        mainLayoutPanel.Controls.Add(profilesListView, 0, 0);
+        mainLayoutPanel.Controls.Add(actionsLayoutPanel, 0, 1);
+        mainLayoutPanel.Dock = DockStyle.Fill;
+        mainLayoutPanel.Padding = new Padding(16);
+        mainLayoutPanel.RowCount = 2;
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         //
         // profilesListView
         //
@@ -36,79 +54,89 @@ partial class ProfilesForm
             typeColumnHeader,
             sizeColumnHeader,
             layoutColumnHeader });
+        profilesListView.Dock = DockStyle.Fill;
         profilesListView.FullRowSelect = true;
         profilesListView.GridLines = true;
         profilesListView.HideSelection = false;
-        profilesListView.Location = new Point(20, 20);
         profilesListView.MultiSelect = false;
         profilesListView.Name = "profilesListView";
-        profilesListView.Size = new Size(632, 280);
         profilesListView.TabIndex = 0;
         profilesListView.UseCompatibleStateImageBehavior = false;
         profilesListView.View = View.Details;
         //
-        // nameColumnHeader
+        // columns
         //
-        nameColumnHeader.Text = "Nazwa";
-        nameColumnHeader.Width = 270;
-        //
-        // typeColumnHeader
-        //
+        nameColumnHeader.Text = "Nazwa profilu etykiety";
+        nameColumnHeader.Width = 320;
         typeColumnHeader.Text = "Typ";
-        typeColumnHeader.Width = 90;
-        //
-        // sizeColumnHeader
-        //
+        typeColumnHeader.Width = 100;
         sizeColumnHeader.Text = "Rozmiar";
         sizeColumnHeader.Width = 150;
-        //
-        // layoutColumnHeader
-        //
         layoutColumnHeader.Text = "Układ";
-        layoutColumnHeader.Width = 80;
+        layoutColumnHeader.Width = 90;
         //
-        // newButton
+        // actionsLayoutPanel
         //
-        newButton.Location = new Point(20, 318);
+        actionsLayoutPanel.AutoSize = true;
+        actionsLayoutPanel.ColumnCount = 3;
+        actionsLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        actionsLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        actionsLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        actionsLayoutPanel.Controls.Add(editButtonsPanel, 0, 0);
+        actionsLayoutPanel.Controls.Add(closeButton, 2, 0);
+        actionsLayoutPanel.Dock = DockStyle.Fill;
+        actionsLayoutPanel.Margin = new Padding(0);
+        actionsLayoutPanel.RowCount = 1;
+        actionsLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        //
+        // editButtonsPanel
+        //
+        editButtonsPanel.AutoSize = true;
+        editButtonsPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        editButtonsPanel.Controls.Add(newButton);
+        editButtonsPanel.Controls.Add(editButton);
+        editButtonsPanel.Controls.Add(duplicateButton);
+        editButtonsPanel.Controls.Add(deleteButton);
+        editButtonsPanel.Anchor = AnchorStyles.Left;
+        editButtonsPanel.Margin = new Padding(0);
+        editButtonsPanel.WrapContents = false;
+        //
+        // action buttons
+        //
         newButton.Name = "newButton";
-        newButton.Size = new Size(92, 34);
+        newButton.AutoSize = false;
+        newButton.MinimumSize = new Size(96, 34);
+        newButton.Size = new Size(96, 34);
         newButton.TabIndex = 1;
         newButton.Text = "Nowy";
         newButton.UseVisualStyleBackColor = true;
-        //
-        // editButton
-        //
-        editButton.Location = new Point(118, 318);
         editButton.Name = "editButton";
-        editButton.Size = new Size(92, 34);
+        editButton.AutoSize = false;
+        editButton.MinimumSize = new Size(96, 34);
+        editButton.Size = new Size(96, 34);
         editButton.TabIndex = 2;
         editButton.Text = "Edytuj";
         editButton.UseVisualStyleBackColor = true;
-        //
-        // duplicateButton
-        //
-        duplicateButton.Location = new Point(216, 318);
         duplicateButton.Name = "duplicateButton";
-        duplicateButton.Size = new Size(92, 34);
+        duplicateButton.AutoSize = false;
+        duplicateButton.MinimumSize = new Size(96, 34);
+        duplicateButton.Size = new Size(96, 34);
         duplicateButton.TabIndex = 3;
         duplicateButton.Text = "Duplikuj";
         duplicateButton.UseVisualStyleBackColor = true;
-        //
-        // deleteButton
-        //
-        deleteButton.Location = new Point(314, 318);
         deleteButton.Name = "deleteButton";
-        deleteButton.Size = new Size(92, 34);
+        deleteButton.AutoSize = false;
+        deleteButton.MinimumSize = new Size(96, 34);
+        deleteButton.Size = new Size(96, 34);
         deleteButton.TabIndex = 4;
         deleteButton.Text = "Usuń";
         deleteButton.UseVisualStyleBackColor = true;
-        //
-        // closeButton
-        //
+        closeButton.Anchor = AnchorStyles.Right;
+        closeButton.AutoSize = false;
         closeButton.DialogResult = DialogResult.Cancel;
-        closeButton.Location = new Point(560, 318);
         closeButton.Name = "closeButton";
-        closeButton.Size = new Size(92, 34);
+        closeButton.MinimumSize = new Size(100, 34);
+        closeButton.Size = new Size(100, 34);
         closeButton.TabIndex = 5;
         closeButton.Text = "Zamknij";
         closeButton.UseVisualStyleBackColor = true;
@@ -116,30 +144,33 @@ partial class ProfilesForm
         // ProfilesForm
         //
         AcceptButton = editButton;
-        AutoScaleMode = AutoScaleMode.Font;
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
         CancelButton = closeButton;
-        ClientSize = new Size(672, 372);
-        Controls.Add(closeButton);
-        Controls.Add(deleteButton);
-        Controls.Add(duplicateButton);
-        Controls.Add(editButton);
-        Controls.Add(newButton);
-        Controls.Add(profilesListView);
-        FormBorderStyle = FormBorderStyle.FixedDialog;
-        MaximizeBox = false;
-        MinimizeBox = false;
+        ClientSize = new Size(720, 430);
+        Controls.Add(mainLayoutPanel);
+        Font = new Font("Segoe UI", 9F);
+        MinimumSize = new Size(620, 360);
         Name = "ProfilesForm";
         ShowInTaskbar = false;
         StartPosition = FormStartPosition.CenterParent;
         Text = "Profile etykiet";
+        mainLayoutPanel.ResumeLayout(false);
+        mainLayoutPanel.PerformLayout();
+        actionsLayoutPanel.ResumeLayout(false);
+        actionsLayoutPanel.PerformLayout();
+        editButtonsPanel.ResumeLayout(false);
         ResumeLayout(false);
     }
 
+    private TableLayoutPanel mainLayoutPanel;
     private ListView profilesListView;
     private ColumnHeader nameColumnHeader;
     private ColumnHeader typeColumnHeader;
     private ColumnHeader sizeColumnHeader;
     private ColumnHeader layoutColumnHeader;
+    private TableLayoutPanel actionsLayoutPanel;
+    private FlowLayoutPanel editButtonsPanel;
     private Button newButton;
     private Button editButton;
     private Button duplicateButton;

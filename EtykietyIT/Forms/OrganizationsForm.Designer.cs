@@ -17,6 +17,7 @@ partial class OrganizationsForm
     private void InitializeComponent()
     {
         components = new System.ComponentModel.Container();
+        mainLayoutPanel = new TableLayoutPanel();
         organizationsListView = new ListView();
         nameColumnHeader = new ColumnHeader();
         companyColumnHeader = new ColumnHeader();
@@ -25,12 +26,31 @@ partial class OrganizationsForm
         labelProfileColumnHeader = new ColumnHeader();
         printerColumnHeader = new ColumnHeader();
         skippedFilesLabel = new Label();
+        actionsLayoutPanel = new TableLayoutPanel();
+        editButtonsPanel = new FlowLayoutPanel();
         newButton = new Button();
         editButton = new Button();
         duplicateButton = new Button();
         deleteButton = new Button();
         closeButton = new Button();
+        mainLayoutPanel.SuspendLayout();
+        actionsLayoutPanel.SuspendLayout();
+        editButtonsPanel.SuspendLayout();
         SuspendLayout();
+        //
+        // mainLayoutPanel
+        //
+        mainLayoutPanel.ColumnCount = 1;
+        mainLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        mainLayoutPanel.Controls.Add(organizationsListView, 0, 0);
+        mainLayoutPanel.Controls.Add(skippedFilesLabel, 0, 1);
+        mainLayoutPanel.Controls.Add(actionsLayoutPanel, 0, 2);
+        mainLayoutPanel.Dock = DockStyle.Fill;
+        mainLayoutPanel.Padding = new Padding(16);
+        mainLayoutPanel.RowCount = 3;
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         //
         // organizationsListView
         //
@@ -41,126 +61,128 @@ partial class OrganizationsForm
             nextNumberColumnHeader,
             labelProfileColumnHeader,
             printerColumnHeader });
+        organizationsListView.Dock = DockStyle.Fill;
         organizationsListView.FullRowSelect = true;
         organizationsListView.GridLines = true;
         organizationsListView.HideSelection = false;
-        organizationsListView.Location = new Point(20, 20);
         organizationsListView.MultiSelect = false;
         organizationsListView.Name = "organizationsListView";
-        organizationsListView.Size = new Size(940, 330);
         organizationsListView.TabIndex = 0;
         organizationsListView.UseCompatibleStateImageBehavior = false;
         organizationsListView.View = View.Details;
         //
-        // nameColumnHeader
+        // columns
         //
         nameColumnHeader.Text = "Profil organizacji";
-        nameColumnHeader.Width = 170;
-        //
-        // companyColumnHeader
-        //
+        nameColumnHeader.Width = 180;
         companyColumnHeader.Text = "Firma na etykiecie";
         companyColumnHeader.Width = 190;
-        //
-        // assetIdColumnHeader
-        //
         assetIdColumnHeader.Text = "Asset ID";
         assetIdColumnHeader.Width = 120;
-        //
-        // nextNumberColumnHeader
-        //
         nextNumberColumnHeader.Text = "Następny numer";
-        nextNumberColumnHeader.Width = 105;
-        //
-        // labelProfileColumnHeader
-        //
+        nextNumberColumnHeader.Width = 110;
         labelProfileColumnHeader.Text = "Profil etykiety";
-        labelProfileColumnHeader.Width = 170;
-        //
-        // printerColumnHeader
-        //
+        labelProfileColumnHeader.Width = 180;
         printerColumnHeader.Text = "Drukarka";
-        printerColumnHeader.Width = 160;
+        printerColumnHeader.Width = 180;
         //
         // skippedFilesLabel
         //
         skippedFilesLabel.AutoSize = true;
         skippedFilesLabel.ForeColor = Color.DarkRed;
-        skippedFilesLabel.Location = new Point(20, 366);
+        skippedFilesLabel.Margin = new Padding(0, 10, 0, 0);
         skippedFilesLabel.Name = "skippedFilesLabel";
-        skippedFilesLabel.Size = new Size(169, 15);
-        skippedFilesLabel.TabIndex = 1;
         skippedFilesLabel.Text = "Pominięte uszkodzone pliki: 0";
         skippedFilesLabel.Visible = false;
         //
-        // newButton
+        // actionsLayoutPanel
         //
-        newButton.Location = new Point(20, 398);
+        actionsLayoutPanel.AutoSize = true;
+        actionsLayoutPanel.ColumnCount = 3;
+        actionsLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        actionsLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        actionsLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        actionsLayoutPanel.Controls.Add(editButtonsPanel, 0, 0);
+        actionsLayoutPanel.Controls.Add(closeButton, 2, 0);
+        actionsLayoutPanel.Dock = DockStyle.Fill;
+        actionsLayoutPanel.Margin = new Padding(0);
+        actionsLayoutPanel.RowCount = 1;
+        actionsLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        //
+        // editButtonsPanel
+        //
+        editButtonsPanel.AutoSize = true;
+        editButtonsPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        editButtonsPanel.Controls.Add(newButton);
+        editButtonsPanel.Controls.Add(editButton);
+        editButtonsPanel.Controls.Add(duplicateButton);
+        editButtonsPanel.Controls.Add(deleteButton);
+        editButtonsPanel.Anchor = AnchorStyles.Left;
+        editButtonsPanel.Margin = new Padding(0);
+        editButtonsPanel.WrapContents = false;
+        //
+        // action buttons
+        //
         newButton.Name = "newButton";
-        newButton.Size = new Size(92, 34);
-        newButton.TabIndex = 2;
-        newButton.Text = "Nowa";
+        newButton.AutoSize = false;
+        newButton.MinimumSize = new Size(96, 34);
+        newButton.Size = new Size(96, 34);
+        newButton.TabIndex = 1;
+        newButton.Text = "Nowy";
         newButton.UseVisualStyleBackColor = true;
-        //
-        // editButton
-        //
-        editButton.Location = new Point(118, 398);
         editButton.Name = "editButton";
-        editButton.Size = new Size(92, 34);
-        editButton.TabIndex = 3;
+        editButton.AutoSize = false;
+        editButton.MinimumSize = new Size(96, 34);
+        editButton.Size = new Size(96, 34);
+        editButton.TabIndex = 2;
         editButton.Text = "Edytuj";
         editButton.UseVisualStyleBackColor = true;
-        //
-        // duplicateButton
-        //
-        duplicateButton.Location = new Point(216, 398);
         duplicateButton.Name = "duplicateButton";
-        duplicateButton.Size = new Size(92, 34);
-        duplicateButton.TabIndex = 4;
+        duplicateButton.AutoSize = false;
+        duplicateButton.MinimumSize = new Size(96, 34);
+        duplicateButton.Size = new Size(96, 34);
+        duplicateButton.TabIndex = 3;
         duplicateButton.Text = "Duplikuj";
         duplicateButton.UseVisualStyleBackColor = true;
-        //
-        // deleteButton
-        //
-        deleteButton.Location = new Point(314, 398);
         deleteButton.Name = "deleteButton";
-        deleteButton.Size = new Size(92, 34);
-        deleteButton.TabIndex = 5;
+        deleteButton.AutoSize = false;
+        deleteButton.MinimumSize = new Size(96, 34);
+        deleteButton.Size = new Size(96, 34);
+        deleteButton.TabIndex = 4;
         deleteButton.Text = "Usuń";
         deleteButton.UseVisualStyleBackColor = true;
-        //
-        // closeButton
-        //
+        closeButton.Anchor = AnchorStyles.Right;
+        closeButton.AutoSize = false;
         closeButton.DialogResult = DialogResult.Cancel;
-        closeButton.Location = new Point(868, 398);
         closeButton.Name = "closeButton";
-        closeButton.Size = new Size(92, 34);
-        closeButton.TabIndex = 6;
+        closeButton.MinimumSize = new Size(100, 34);
+        closeButton.Size = new Size(100, 34);
+        closeButton.TabIndex = 5;
         closeButton.Text = "Zamknij";
         closeButton.UseVisualStyleBackColor = true;
         //
         // OrganizationsForm
         //
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
         CancelButton = closeButton;
-        ClientSize = new Size(980, 452);
-        Controls.Add(closeButton);
-        Controls.Add(deleteButton);
-        Controls.Add(duplicateButton);
-        Controls.Add(editButton);
-        Controls.Add(newButton);
-        Controls.Add(skippedFilesLabel);
-        Controls.Add(organizationsListView);
-        FormBorderStyle = FormBorderStyle.FixedDialog;
-        MaximizeBox = false;
-        MinimizeBox = false;
+        ClientSize = new Size(1060, 500);
+        Controls.Add(mainLayoutPanel);
+        Font = new Font("Segoe UI", 9F);
+        MinimumSize = new Size(900, 420);
         Name = "OrganizationsForm";
         ShowInTaskbar = false;
         StartPosition = FormStartPosition.CenterParent;
         Text = "Profile organizacji";
+        mainLayoutPanel.ResumeLayout(false);
+        mainLayoutPanel.PerformLayout();
+        actionsLayoutPanel.ResumeLayout(false);
+        actionsLayoutPanel.PerformLayout();
+        editButtonsPanel.ResumeLayout(false);
         ResumeLayout(false);
-        PerformLayout();
     }
 
+    private TableLayoutPanel mainLayoutPanel;
     private ListView organizationsListView;
     private ColumnHeader nameColumnHeader;
     private ColumnHeader companyColumnHeader;
@@ -169,6 +191,8 @@ partial class OrganizationsForm
     private ColumnHeader labelProfileColumnHeader;
     private ColumnHeader printerColumnHeader;
     private Label skippedFilesLabel;
+    private TableLayoutPanel actionsLayoutPanel;
+    private FlowLayoutPanel editButtonsPanel;
     private Button newButton;
     private Button editButton;
     private Button duplicateButton;

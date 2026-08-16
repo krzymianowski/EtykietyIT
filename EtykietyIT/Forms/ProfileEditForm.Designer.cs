@@ -17,6 +17,7 @@ partial class ProfileEditForm
     private void InitializeComponent()
     {
         components = new System.ComponentModel.Container();
+        mainLayoutPanel = new TableLayoutPanel();
         nameLabel = new Label();
         nameTextBox = new TextBox();
         widthLabel = new Label();
@@ -28,174 +29,192 @@ partial class ProfileEditForm
         rowsLabel = new Label();
         rowsNumericUpDown = new NumericUpDown();
         drawCutLinesCheckBox = new CheckBox();
+        buttonsPanel = new FlowLayoutPanel();
         saveButton = new Button();
         cancelButton = new Button();
+        mainLayoutPanel.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)widthNumericUpDown).BeginInit();
         ((System.ComponentModel.ISupportInitialize)heightNumericUpDown).BeginInit();
         ((System.ComponentModel.ISupportInitialize)columnsNumericUpDown).BeginInit();
         ((System.ComponentModel.ISupportInitialize)rowsNumericUpDown).BeginInit();
+        buttonsPanel.SuspendLayout();
         SuspendLayout();
         //
-        // nameLabel
+        // mainLayoutPanel
         //
+        mainLayoutPanel.ColumnCount = 2;
+        mainLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        mainLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        mainLayoutPanel.Controls.Add(nameLabel, 0, 0);
+        mainLayoutPanel.Controls.Add(nameTextBox, 1, 0);
+        mainLayoutPanel.Controls.Add(widthLabel, 0, 1);
+        mainLayoutPanel.Controls.Add(widthNumericUpDown, 1, 1);
+        mainLayoutPanel.Controls.Add(heightLabel, 0, 2);
+        mainLayoutPanel.Controls.Add(heightNumericUpDown, 1, 2);
+        mainLayoutPanel.Controls.Add(columnsLabel, 0, 3);
+        mainLayoutPanel.Controls.Add(columnsNumericUpDown, 1, 3);
+        mainLayoutPanel.Controls.Add(rowsLabel, 0, 4);
+        mainLayoutPanel.Controls.Add(rowsNumericUpDown, 1, 4);
+        mainLayoutPanel.Controls.Add(drawCutLinesCheckBox, 1, 5);
+        mainLayoutPanel.Controls.Add(buttonsPanel, 0, 7);
+        mainLayoutPanel.SetColumnSpan(buttonsPanel, 2);
+        mainLayoutPanel.Dock = DockStyle.Fill;
+        mainLayoutPanel.Padding = new Padding(20);
+        mainLayoutPanel.RowCount = 8;
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        //
+        // labels
+        //
+        nameLabel.Anchor = AnchorStyles.Left;
         nameLabel.AutoSize = true;
-        nameLabel.Location = new Point(24, 28);
-        nameLabel.Name = "nameLabel";
-        nameLabel.Size = new Size(43, 15);
-        nameLabel.TabIndex = 0;
+        nameLabel.Margin = new Padding(0, 7, 18, 13);
         nameLabel.Text = "Nazwa:";
+        widthLabel.Anchor = AnchorStyles.Left;
+        widthLabel.AutoSize = true;
+        widthLabel.Margin = new Padding(0, 7, 18, 13);
+        widthLabel.Text = "Szerokość [mm]:";
+        heightLabel.Anchor = AnchorStyles.Left;
+        heightLabel.AutoSize = true;
+        heightLabel.Margin = new Padding(0, 7, 18, 13);
+        heightLabel.Text = "Wysokość [mm]:";
+        columnsLabel.Anchor = AnchorStyles.Left;
+        columnsLabel.AutoSize = true;
+        columnsLabel.Margin = new Padding(0, 7, 18, 13);
+        columnsLabel.Text = "Kolumny:";
+        rowsLabel.Anchor = AnchorStyles.Left;
+        rowsLabel.AutoSize = true;
+        rowsLabel.Margin = new Padding(0, 7, 18, 13);
+        rowsLabel.Text = "Wiersze:";
         //
         // nameTextBox
         //
-        nameTextBox.Location = new Point(161, 25);
+        nameTextBox.Dock = DockStyle.Fill;
+        nameTextBox.Margin = new Padding(0, 3, 0, 10);
         nameTextBox.MaxLength = 200;
         nameTextBox.Name = "nameTextBox";
-        nameTextBox.Size = new Size(267, 23);
-        nameTextBox.TabIndex = 1;
-        //
-        // widthLabel
-        //
-        widthLabel.AutoSize = true;
-        widthLabel.Location = new Point(24, 70);
-        widthLabel.Name = "widthLabel";
-        widthLabel.Size = new Size(89, 15);
-        widthLabel.TabIndex = 2;
-        widthLabel.Text = "Szerokość [mm]:";
+        nameTextBox.TabIndex = 0;
         //
         // widthNumericUpDown
         //
         widthNumericUpDown.DecimalPlaces = 1;
+        widthNumericUpDown.Dock = DockStyle.Fill;
         widthNumericUpDown.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
-        widthNumericUpDown.Location = new Point(161, 67);
+        widthNumericUpDown.Margin = new Padding(0, 3, 0, 10);
         widthNumericUpDown.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
         widthNumericUpDown.Minimum = new decimal(new int[] { 20, 0, 0, 0 });
         widthNumericUpDown.Name = "widthNumericUpDown";
-        widthNumericUpDown.Size = new Size(130, 23);
-        widthNumericUpDown.TabIndex = 3;
+        widthNumericUpDown.TabIndex = 1;
         widthNumericUpDown.Value = new decimal(new int[] { 89, 0, 0, 0 });
-        //
-        // heightLabel
-        //
-        heightLabel.AutoSize = true;
-        heightLabel.Location = new Point(24, 112);
-        heightLabel.Name = "heightLabel";
-        heightLabel.Size = new Size(91, 15);
-        heightLabel.TabIndex = 4;
-        heightLabel.Text = "Wysokość [mm]:";
         //
         // heightNumericUpDown
         //
         heightNumericUpDown.DecimalPlaces = 1;
+        heightNumericUpDown.Dock = DockStyle.Fill;
         heightNumericUpDown.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
-        heightNumericUpDown.Location = new Point(161, 109);
+        heightNumericUpDown.Margin = new Padding(0, 3, 0, 10);
         heightNumericUpDown.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
         heightNumericUpDown.Minimum = new decimal(new int[] { 15, 0, 0, 0 });
         heightNumericUpDown.Name = "heightNumericUpDown";
-        heightNumericUpDown.Size = new Size(130, 23);
-        heightNumericUpDown.TabIndex = 5;
+        heightNumericUpDown.TabIndex = 2;
         heightNumericUpDown.Value = new decimal(new int[] { 41, 0, 0, 0 });
-        //
-        // columnsLabel
-        //
-        columnsLabel.AutoSize = true;
-        columnsLabel.Location = new Point(24, 154);
-        columnsLabel.Name = "columnsLabel";
-        columnsLabel.Size = new Size(56, 15);
-        columnsLabel.TabIndex = 6;
-        columnsLabel.Text = "Kolumny:";
         //
         // columnsNumericUpDown
         //
-        columnsNumericUpDown.Location = new Point(161, 151);
+        columnsNumericUpDown.Dock = DockStyle.Fill;
+        columnsNumericUpDown.Margin = new Padding(0, 3, 0, 10);
         columnsNumericUpDown.Maximum = new decimal(new int[] { 20, 0, 0, 0 });
         columnsNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
         columnsNumericUpDown.Name = "columnsNumericUpDown";
-        columnsNumericUpDown.Size = new Size(130, 23);
-        columnsNumericUpDown.TabIndex = 7;
+        columnsNumericUpDown.TabIndex = 3;
         columnsNumericUpDown.Value = new decimal(new int[] { 2, 0, 0, 0 });
-        //
-        // rowsLabel
-        //
-        rowsLabel.AutoSize = true;
-        rowsLabel.Location = new Point(24, 196);
-        rowsLabel.Name = "rowsLabel";
-        rowsLabel.Size = new Size(49, 15);
-        rowsLabel.TabIndex = 8;
-        rowsLabel.Text = "Wiersze:";
         //
         // rowsNumericUpDown
         //
-        rowsNumericUpDown.Location = new Point(161, 193);
+        rowsNumericUpDown.Dock = DockStyle.Fill;
+        rowsNumericUpDown.Margin = new Padding(0, 3, 0, 10);
         rowsNumericUpDown.Maximum = new decimal(new int[] { 20, 0, 0, 0 });
         rowsNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
         rowsNumericUpDown.Name = "rowsNumericUpDown";
-        rowsNumericUpDown.Size = new Size(130, 23);
-        rowsNumericUpDown.TabIndex = 9;
+        rowsNumericUpDown.TabIndex = 4;
         rowsNumericUpDown.Value = new decimal(new int[] { 1, 0, 0, 0 });
         //
         // drawCutLinesCheckBox
         //
+        drawCutLinesCheckBox.Anchor = AnchorStyles.Left;
         drawCutLinesCheckBox.AutoSize = true;
-        drawCutLinesCheckBox.Location = new Point(161, 235);
+        drawCutLinesCheckBox.Margin = new Padding(0, 4, 0, 10);
         drawCutLinesCheckBox.Name = "drawCutLinesCheckBox";
-        drawCutLinesCheckBox.Size = new Size(87, 19);
-        drawCutLinesCheckBox.TabIndex = 10;
+        drawCutLinesCheckBox.TabIndex = 5;
         drawCutLinesCheckBox.Text = "Linie cięcia";
         drawCutLinesCheckBox.UseVisualStyleBackColor = true;
         //
+        // buttonsPanel
+        //
+        buttonsPanel.AutoSize = true;
+        buttonsPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        buttonsPanel.Controls.Add(cancelButton);
+        buttonsPanel.Controls.Add(saveButton);
+        buttonsPanel.Dock = DockStyle.Fill;
+        buttonsPanel.FlowDirection = FlowDirection.RightToLeft;
+        buttonsPanel.Margin = new Padding(0, 12, 0, 0);
+        buttonsPanel.WrapContents = false;
+        //
         // saveButton
         //
-        saveButton.Location = new Point(250, 285);
+        saveButton.AutoSize = false;
+        saveButton.MinimumSize = new Size(96, 34);
         saveButton.Name = "saveButton";
-        saveButton.Size = new Size(86, 32);
-        saveButton.TabIndex = 11;
+        saveButton.Size = new Size(96, 34);
+        saveButton.TabIndex = 6;
         saveButton.Text = "Zapisz";
         saveButton.UseVisualStyleBackColor = true;
         //
         // cancelButton
         //
+        cancelButton.AutoSize = false;
         cancelButton.DialogResult = DialogResult.Cancel;
-        cancelButton.Location = new Point(342, 285);
+        cancelButton.MinimumSize = new Size(96, 34);
         cancelButton.Name = "cancelButton";
-        cancelButton.Size = new Size(86, 32);
-        cancelButton.TabIndex = 12;
+        cancelButton.Size = new Size(96, 34);
+        cancelButton.TabIndex = 7;
         cancelButton.Text = "Anuluj";
         cancelButton.UseVisualStyleBackColor = true;
         //
         // ProfileEditForm
         //
         AcceptButton = saveButton;
-        AutoScaleMode = AutoScaleMode.Font;
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
         CancelButton = cancelButton;
-        ClientSize = new Size(452, 341);
-        Controls.Add(cancelButton);
-        Controls.Add(saveButton);
-        Controls.Add(drawCutLinesCheckBox);
-        Controls.Add(rowsNumericUpDown);
-        Controls.Add(rowsLabel);
-        Controls.Add(columnsNumericUpDown);
-        Controls.Add(columnsLabel);
-        Controls.Add(heightNumericUpDown);
-        Controls.Add(heightLabel);
-        Controls.Add(widthNumericUpDown);
-        Controls.Add(widthLabel);
-        Controls.Add(nameTextBox);
-        Controls.Add(nameLabel);
-        FormBorderStyle = FormBorderStyle.FixedDialog;
+        ClientSize = new Size(500, 390);
+        Controls.Add(mainLayoutPanel);
+        Font = new Font("Segoe UI", 9F);
         MaximizeBox = false;
         MinimizeBox = false;
+        MinimumSize = new Size(460, 360);
         Name = "ProfileEditForm";
         ShowInTaskbar = false;
         StartPosition = FormStartPosition.CenterParent;
         Text = "Profil etykiety";
+        mainLayoutPanel.ResumeLayout(false);
+        mainLayoutPanel.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)widthNumericUpDown).EndInit();
         ((System.ComponentModel.ISupportInitialize)heightNumericUpDown).EndInit();
         ((System.ComponentModel.ISupportInitialize)columnsNumericUpDown).EndInit();
         ((System.ComponentModel.ISupportInitialize)rowsNumericUpDown).EndInit();
+        buttonsPanel.ResumeLayout(false);
+        buttonsPanel.PerformLayout();
         ResumeLayout(false);
-        PerformLayout();
     }
 
+    private TableLayoutPanel mainLayoutPanel;
     private Label nameLabel;
     private TextBox nameTextBox;
     private Label widthLabel;
@@ -207,6 +226,7 @@ partial class ProfileEditForm
     private Label rowsLabel;
     private NumericUpDown rowsNumericUpDown;
     private CheckBox drawCutLinesCheckBox;
+    private FlowLayoutPanel buttonsPanel;
     private Button saveButton;
     private Button cancelButton;
 }

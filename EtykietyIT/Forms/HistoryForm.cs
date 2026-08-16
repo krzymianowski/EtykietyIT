@@ -81,7 +81,7 @@ public partial class HistoryForm : Form
         historyDataGridView.Columns.Add(
             CreateTextColumn("organizationColumn", "Organizacja", 130));
         historyDataGridView.Columns.Add(
-            CreateTextColumn("profileColumn", "Profil", 145));
+            CreateTextColumn("profileColumn", "Profil etykiety", 145));
         historyDataGridView.Columns.Add(
             CreateTextColumn("printerColumn", "Drukarka", 160));
         historyDataGridView.Columns.Add(
@@ -337,7 +337,7 @@ public partial class HistoryForm : Form
         details.AppendLine($"Korekta X: {snapshot.OffsetXmm:0.0} mm");
         details.AppendLine($"Korekta Y: {snapshot.OffsetYmm:0.0} mm");
         details.AppendLine();
-        details.AppendLine("PROFIL");
+        details.AppendLine("PROFIL ETYKIETY");
         details.AppendLine($"Nazwa: {snapshot.ProfileName}");
         details.AppendLine($"ID: {snapshot.ProfileId}");
         details.AppendLine($"Rozmiar: {snapshot.WidthMm:0.0} × {snapshot.HeightMm:0.0} mm");

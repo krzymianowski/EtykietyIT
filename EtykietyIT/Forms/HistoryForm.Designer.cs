@@ -17,6 +17,8 @@ partial class HistoryForm
     private void InitializeComponent()
     {
         components = new System.ComponentModel.Container();
+        mainLayoutPanel = new TableLayoutPanel();
+        filterPanel = new FlowLayoutPanel();
         searchLabel = new Label();
         searchTextBox = new TextBox();
         dateFilterCheckBox = new CheckBox();
@@ -25,87 +27,139 @@ partial class HistoryForm
         dateToLabel = new Label();
         dateToDateTimePicker = new DateTimePicker();
         skippedRecordsLabel = new Label();
+        contentSplitContainer = new SplitContainer();
         historyDataGridView = new DataGridView();
         detailsGroupBox = new GroupBox();
         detailsTextBox = new TextBox();
+        bottomLayoutPanel = new TableLayoutPanel();
+        exportButtonsPanel = new FlowLayoutPanel();
         exportCsvButton = new Button();
         exportXlsxButton = new Button();
         closeButton = new Button();
+        mainLayoutPanel.SuspendLayout();
+        filterPanel.SuspendLayout();
+        ((System.ComponentModel.ISupportInitialize)contentSplitContainer).BeginInit();
+        contentSplitContainer.Panel1.SuspendLayout();
+        contentSplitContainer.Panel2.SuspendLayout();
+        contentSplitContainer.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)historyDataGridView).BeginInit();
         detailsGroupBox.SuspendLayout();
+        bottomLayoutPanel.SuspendLayout();
+        exportButtonsPanel.SuspendLayout();
         SuspendLayout();
+        //
+        // mainLayoutPanel
+        //
+        mainLayoutPanel.ColumnCount = 1;
+        mainLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        mainLayoutPanel.Controls.Add(filterPanel, 0, 0);
+        mainLayoutPanel.Controls.Add(contentSplitContainer, 0, 1);
+        mainLayoutPanel.Controls.Add(bottomLayoutPanel, 0, 2);
+        mainLayoutPanel.Dock = DockStyle.Fill;
+        mainLayoutPanel.Padding = new Padding(16);
+        mainLayoutPanel.RowCount = 3;
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        mainLayoutPanel.TabIndex = 0;
+        //
+        // filterPanel
+        //
+        filterPanel.AutoSize = true;
+        filterPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        filterPanel.Controls.Add(searchLabel);
+        filterPanel.Controls.Add(searchTextBox);
+        filterPanel.Controls.Add(dateFilterCheckBox);
+        filterPanel.Controls.Add(dateFromLabel);
+        filterPanel.Controls.Add(dateFromDateTimePicker);
+        filterPanel.Controls.Add(dateToLabel);
+        filterPanel.Controls.Add(dateToDateTimePicker);
+        filterPanel.Controls.Add(skippedRecordsLabel);
+        filterPanel.Dock = DockStyle.Fill;
+        filterPanel.Margin = new Padding(0, 0, 0, 12);
+        filterPanel.Name = "filterPanel";
+        filterPanel.WrapContents = true;
         //
         // searchLabel
         //
+        searchLabel.Anchor = AnchorStyles.Left;
         searchLabel.AutoSize = true;
-        searchLabel.Location = new Point(20, 24);
-        searchLabel.Name = "searchLabel";
-        searchLabel.Size = new Size(45, 15);
-        searchLabel.TabIndex = 0;
+        searchLabel.Margin = new Padding(0, 7, 8, 0);
         searchLabel.Text = "Szukaj:";
         //
         // searchTextBox
         //
-        searchTextBox.Location = new Point(75, 20);
+        searchTextBox.Margin = new Padding(0, 3, 16, 3);
         searchTextBox.Name = "searchTextBox";
-        searchTextBox.PlaceholderText = "Asset ID, drukarka, profil lub firma";
-        searchTextBox.Size = new Size(315, 23);
-        searchTextBox.TabIndex = 1;
+        searchTextBox.PlaceholderText =
+            "Asset ID, organizacja, drukarka, profil etykiety lub firma";
+        searchTextBox.Size = new Size(330, 23);
+        searchTextBox.TabIndex = 0;
         //
         // dateFilterCheckBox
         //
+        dateFilterCheckBox.Anchor = AnchorStyles.Left;
         dateFilterCheckBox.AutoSize = true;
-        dateFilterCheckBox.Location = new Point(420, 22);
+        dateFilterCheckBox.Margin = new Padding(0, 6, 14, 0);
         dateFilterCheckBox.Name = "dateFilterCheckBox";
-        dateFilterCheckBox.Size = new Size(92, 19);
-        dateFilterCheckBox.TabIndex = 2;
+        dateFilterCheckBox.TabIndex = 1;
         dateFilterCheckBox.Text = "Filtruj daty";
         dateFilterCheckBox.UseVisualStyleBackColor = true;
         //
         // dateFromLabel
         //
+        dateFromLabel.Anchor = AnchorStyles.Left;
         dateFromLabel.AutoSize = true;
-        dateFromLabel.Location = new Point(527, 24);
-        dateFromLabel.Name = "dateFromLabel";
-        dateFromLabel.Size = new Size(25, 15);
-        dateFromLabel.TabIndex = 3;
+        dateFromLabel.Margin = new Padding(0, 7, 6, 0);
         dateFromLabel.Text = "Od:";
         //
         // dateFromDateTimePicker
         //
         dateFromDateTimePicker.Format = DateTimePickerFormat.Short;
-        dateFromDateTimePicker.Location = new Point(558, 20);
+        dateFromDateTimePicker.Margin = new Padding(0, 3, 12, 3);
         dateFromDateTimePicker.Name = "dateFromDateTimePicker";
         dateFromDateTimePicker.Size = new Size(110, 23);
-        dateFromDateTimePicker.TabIndex = 4;
+        dateFromDateTimePicker.TabIndex = 2;
         //
         // dateToLabel
         //
+        dateToLabel.Anchor = AnchorStyles.Left;
         dateToLabel.AutoSize = true;
-        dateToLabel.Location = new Point(680, 24);
-        dateToLabel.Name = "dateToLabel";
-        dateToLabel.Size = new Size(24, 15);
-        dateToLabel.TabIndex = 5;
+        dateToLabel.Margin = new Padding(0, 7, 6, 0);
         dateToLabel.Text = "Do:";
         //
         // dateToDateTimePicker
         //
         dateToDateTimePicker.Format = DateTimePickerFormat.Short;
-        dateToDateTimePicker.Location = new Point(710, 20);
+        dateToDateTimePicker.Margin = new Padding(0, 3, 12, 3);
         dateToDateTimePicker.Name = "dateToDateTimePicker";
         dateToDateTimePicker.Size = new Size(110, 23);
-        dateToDateTimePicker.TabIndex = 6;
+        dateToDateTimePicker.TabIndex = 3;
         //
         // skippedRecordsLabel
         //
+        skippedRecordsLabel.Anchor = AnchorStyles.Left;
         skippedRecordsLabel.AutoSize = true;
         skippedRecordsLabel.ForeColor = Color.DarkRed;
-        skippedRecordsLabel.Location = new Point(840, 24);
+        skippedRecordsLabel.Margin = new Padding(0, 7, 0, 0);
         skippedRecordsLabel.Name = "skippedRecordsLabel";
-        skippedRecordsLabel.Size = new Size(181, 15);
-        skippedRecordsLabel.TabIndex = 7;
         skippedRecordsLabel.Text = "Pominięte uszkodzone rekordy: 0";
         skippedRecordsLabel.Visible = false;
+        //
+        // contentSplitContainer
+        //
+        contentSplitContainer.Dock = DockStyle.Fill;
+        contentSplitContainer.FixedPanel = FixedPanel.Panel2;
+        contentSplitContainer.Location = new Point(16, 58);
+        contentSplitContainer.Name = "contentSplitContainer";
+        contentSplitContainer.Panel1.Controls.Add(historyDataGridView);
+        contentSplitContainer.Panel1MinSize = 520;
+        contentSplitContainer.Panel2.Controls.Add(detailsGroupBox);
+        contentSplitContainer.Panel2MinSize = 300;
+        contentSplitContainer.Size = new Size(1188, 574);
+        contentSplitContainer.SplitterDistance = 820;
+        contentSplitContainer.SplitterWidth = 8;
+        contentSplitContainer.TabIndex = 1;
         //
         // historyDataGridView
         //
@@ -113,97 +167,124 @@ partial class HistoryForm
         historyDataGridView.AllowUserToDeleteRows = false;
         historyDataGridView.AllowUserToResizeRows = false;
         historyDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-        historyDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-        historyDataGridView.Location = new Point(20, 60);
+        historyDataGridView.ColumnHeadersHeightSizeMode =
+            DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+        historyDataGridView.Dock = DockStyle.Fill;
         historyDataGridView.MultiSelect = false;
         historyDataGridView.Name = "historyDataGridView";
         historyDataGridView.ReadOnly = true;
         historyDataGridView.RowHeadersVisible = false;
         historyDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-        historyDataGridView.Size = new Size(790, 540);
-        historyDataGridView.TabIndex = 8;
+        historyDataGridView.TabIndex = 4;
         //
         // detailsGroupBox
         //
         detailsGroupBox.Controls.Add(detailsTextBox);
-        detailsGroupBox.Location = new Point(830, 60);
+        detailsGroupBox.Dock = DockStyle.Fill;
         detailsGroupBox.Name = "detailsGroupBox";
-        detailsGroupBox.Size = new Size(360, 540);
-        detailsGroupBox.TabIndex = 9;
+        detailsGroupBox.Padding = new Padding(10, 8, 10, 10);
         detailsGroupBox.TabStop = false;
-        detailsGroupBox.Text = "Szczegóły snapshotu";
+        detailsGroupBox.Text = "Szczegóły wydruku";
         //
         // detailsTextBox
         //
         detailsTextBox.BackColor = SystemColors.Window;
+        detailsTextBox.Dock = DockStyle.Fill;
         detailsTextBox.Font = new Font("Consolas", 9F);
-        detailsTextBox.Location = new Point(12, 25);
         detailsTextBox.Multiline = true;
         detailsTextBox.Name = "detailsTextBox";
         detailsTextBox.ReadOnly = true;
         detailsTextBox.ScrollBars = ScrollBars.Vertical;
-        detailsTextBox.Size = new Size(336, 500);
-        detailsTextBox.TabIndex = 0;
+        detailsTextBox.TabIndex = 5;
+        //
+        // bottomLayoutPanel
+        //
+        bottomLayoutPanel.AutoSize = true;
+        bottomLayoutPanel.ColumnCount = 3;
+        bottomLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        bottomLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        bottomLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        bottomLayoutPanel.Controls.Add(exportButtonsPanel, 0, 0);
+        bottomLayoutPanel.Controls.Add(closeButton, 2, 0);
+        bottomLayoutPanel.Dock = DockStyle.Fill;
+        bottomLayoutPanel.Margin = new Padding(0);
+        bottomLayoutPanel.RowCount = 1;
+        bottomLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        //
+        // exportButtonsPanel
+        //
+        exportButtonsPanel.AutoSize = true;
+        exportButtonsPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        exportButtonsPanel.Controls.Add(exportCsvButton);
+        exportButtonsPanel.Controls.Add(exportXlsxButton);
+        exportButtonsPanel.Anchor = AnchorStyles.Left;
+        exportButtonsPanel.Margin = new Padding(0);
+        exportButtonsPanel.WrapContents = false;
         //
         // exportCsvButton
         //
-        exportCsvButton.Location = new Point(20, 616);
         exportCsvButton.Name = "exportCsvButton";
+        exportCsvButton.AutoSize = false;
+        exportCsvButton.MinimumSize = new Size(150, 34);
         exportCsvButton.Size = new Size(150, 34);
-        exportCsvButton.TabIndex = 10;
+        exportCsvButton.TabIndex = 6;
         exportCsvButton.Text = "Eksportuj CSV...";
         exportCsvButton.UseVisualStyleBackColor = true;
         //
         // exportXlsxButton
         //
-        exportXlsxButton.Location = new Point(180, 616);
         exportXlsxButton.Name = "exportXlsxButton";
+        exportXlsxButton.AutoSize = false;
+        exportXlsxButton.MinimumSize = new Size(150, 34);
         exportXlsxButton.Size = new Size(150, 34);
-        exportXlsxButton.TabIndex = 11;
+        exportXlsxButton.TabIndex = 7;
         exportXlsxButton.Text = "Eksportuj XLSX...";
         exportXlsxButton.UseVisualStyleBackColor = true;
         //
         // closeButton
         //
+        closeButton.Anchor = AnchorStyles.Right;
+        closeButton.AutoSize = false;
         closeButton.DialogResult = DialogResult.Cancel;
-        closeButton.Location = new Point(1098, 616);
         closeButton.Name = "closeButton";
-        closeButton.Size = new Size(92, 34);
-        closeButton.TabIndex = 12;
+        closeButton.MinimumSize = new Size(100, 34);
+        closeButton.Size = new Size(100, 34);
+        closeButton.TabIndex = 8;
         closeButton.Text = "Zamknij";
         closeButton.UseVisualStyleBackColor = true;
         //
         // HistoryForm
         //
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
         CancelButton = closeButton;
-        ClientSize = new Size(1210, 670);
-        Controls.Add(closeButton);
-        Controls.Add(exportXlsxButton);
-        Controls.Add(exportCsvButton);
-        Controls.Add(detailsGroupBox);
-        Controls.Add(historyDataGridView);
-        Controls.Add(skippedRecordsLabel);
-        Controls.Add(dateToDateTimePicker);
-        Controls.Add(dateToLabel);
-        Controls.Add(dateFromDateTimePicker);
-        Controls.Add(dateFromLabel);
-        Controls.Add(dateFilterCheckBox);
-        Controls.Add(searchTextBox);
-        Controls.Add(searchLabel);
-        FormBorderStyle = FormBorderStyle.FixedDialog;
-        MaximizeBox = false;
-        MinimizeBox = false;
+        ClientSize = new Size(1220, 700);
+        Controls.Add(mainLayoutPanel);
+        Font = new Font("Segoe UI", 9F);
+        MinimumSize = new Size(1040, 620);
         Name = "HistoryForm";
         ShowInTaskbar = false;
         StartPosition = FormStartPosition.CenterParent;
         Text = "Historia wydruków — Etykiety IT";
+        mainLayoutPanel.ResumeLayout(false);
+        mainLayoutPanel.PerformLayout();
+        filterPanel.ResumeLayout(false);
+        filterPanel.PerformLayout();
+        contentSplitContainer.Panel1.ResumeLayout(false);
+        contentSplitContainer.Panel2.ResumeLayout(false);
+        ((System.ComponentModel.ISupportInitialize)contentSplitContainer).EndInit();
+        contentSplitContainer.ResumeLayout(false);
         ((System.ComponentModel.ISupportInitialize)historyDataGridView).EndInit();
         detailsGroupBox.ResumeLayout(false);
         detailsGroupBox.PerformLayout();
+        bottomLayoutPanel.ResumeLayout(false);
+        bottomLayoutPanel.PerformLayout();
+        exportButtonsPanel.ResumeLayout(false);
         ResumeLayout(false);
-        PerformLayout();
     }
 
+    private TableLayoutPanel mainLayoutPanel;
+    private FlowLayoutPanel filterPanel;
     private Label searchLabel;
     private TextBox searchTextBox;
     private CheckBox dateFilterCheckBox;
@@ -212,9 +293,12 @@ partial class HistoryForm
     private Label dateToLabel;
     private DateTimePicker dateToDateTimePicker;
     private Label skippedRecordsLabel;
+    private SplitContainer contentSplitContainer;
     private DataGridView historyDataGridView;
     private GroupBox detailsGroupBox;
     private TextBox detailsTextBox;
+    private TableLayoutPanel bottomLayoutPanel;
+    private FlowLayoutPanel exportButtonsPanel;
     private Button exportCsvButton;
     private Button exportXlsxButton;
     private Button closeButton;

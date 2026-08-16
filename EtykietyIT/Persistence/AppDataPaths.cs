@@ -18,6 +18,7 @@ public sealed class AppDataPaths
         OrganizationsDirectory = Path.Combine(rootDirectory, "organizations");
         HistoryDirectory = Path.Combine(rootDirectory, "history");
         HistoryFilePath = Path.Combine(HistoryDirectory, "print-history.jsonl");
+        DiagnosticsDirectory = Path.Combine(rootDirectory, "diagnostics");
     }
 
     public string RootDirectory { get; }
@@ -35,6 +36,8 @@ public sealed class AppDataPaths
     public string HistoryDirectory { get; }
 
     public string HistoryFilePath { get; }
+
+    public string DiagnosticsDirectory { get; }
 
     public static AppDataPaths Create(
         ApplicationMode mode,

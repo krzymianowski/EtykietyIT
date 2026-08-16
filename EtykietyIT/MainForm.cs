@@ -7,7 +7,7 @@ using EtykietyIT.Services;
 
 namespace EtykietyIT;
 
-public partial class Form1 : Form
+public partial class MainForm : Form
 {
     private readonly SettingsService _settingsService;
     private readonly OrganizationProfileService _organizationProfileService;
@@ -25,7 +25,7 @@ public partial class Form1 : Form
     private bool _applyingOrganization;
     private bool _loadingProfiles;
 
-    public Form1(
+    public MainForm(
         SettingsService settingsService,
         OrganizationProfileService organizationProfileService,
         PrinterCalibrationService printerCalibrationService,
@@ -69,14 +69,18 @@ public partial class Form1 : Form
         saveCalibrationButton.Click += SaveCalibrationButton_Click;
         previewButton.Click += PreviewButton_Click;
         printButton.Click += PrintButton_Click;
-        Shown += Form1_Shown;
+        exitMenuItem.Click += ExitMenuItem_Click;
+        organizationProfilesMenuItem.Click += ManageOrganizationsButton_Click;
+        labelProfilesMenuItem.Click += ProfilesButton_Click;
+        aboutMenuItem.Click += AboutMenuItem_Click;
+        Shown += MainForm_Shown;
 
         firstNumberNumericUpDown.Value = 1;
         LoadInstalledPrinters();
         UpdateAssetRange();
     }
 
-    private async void Form1_Shown(object? sender, EventArgs e)
+    private async void MainForm_Shown(object? sender, EventArgs e)
     {
         await ReloadOrganizationsAsync(_settings.ActiveOrganizationProfileId);
     }
@@ -325,6 +329,17 @@ public partial class Form1 : Form
         historyForm.ShowDialog(this);
     }
 
+    private void ExitMenuItem_Click(object? sender, EventArgs e)
+    {
+        Close();
+    }
+
+    private void AboutMenuItem_Click(object? sender, EventArgs e)
+    {
+        using var aboutForm = new AboutForm(_applicationVersionService);
+        aboutForm.ShowDialog(this);
+    }
+
     private async void SaveCalibrationButton_Click(object? sender, EventArgs e)
     {
         string? printerName = GetSelectedPrinterName();
@@ -342,7 +357,7 @@ public partial class Form1 : Form
 
             MessageBox.Show(
                 this,
-                $"Zapisano globalną kalibrację drukarki:\r\n{printerName}",
+                $"Zapisano kalibrację drukarki:\r\n{printerName}",
                 "Kalibracja drukarki",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);

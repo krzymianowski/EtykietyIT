@@ -43,7 +43,19 @@ public partial class OrganizationsForm : Form
         duplicateButton.Click += DuplicateButton_Click;
         deleteButton.Click += DeleteButton_Click;
         closeButton.Click += CloseButton_Click;
+        organizationsListView.Resize += OrganizationsListView_Resize;
         UpdateActionButtons();
+    }
+
+    private void OrganizationsListView_Resize(object? sender, EventArgs e)
+    {
+        int fixedWidth = nameColumnHeader.Width + assetIdColumnHeader.Width +
+            nextNumberColumnHeader.Width + labelProfileColumnHeader.Width;
+        int flexibleWidth = Math.Max(
+            340,
+            organizationsListView.ClientSize.Width - fixedWidth - 8);
+        companyColumnHeader.Width = flexibleWidth / 2;
+        printerColumnHeader.Width = flexibleWidth - companyColumnHeader.Width;
     }
 
     public ApplicationSettings Settings { get; private set; }
