@@ -1,0 +1,127 @@
+name: Bug report
+description: Report a reproducible problem in Etykiety IT.
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a problem. Security vulnerabilities must be reported using Private Vulnerability Reporting, not this form.
+
+  - type: input
+    id: version
+    attributes:
+      label: Etykiety IT version
+      description: Enter the application version shown in the About window.
+      placeholder: "3.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: application-mode
+    attributes:
+      label: Application mode
+      options:
+        - Standard
+        - Portable
+        - Not sure
+    validations:
+      required: true
+
+  - type: input
+    id: windows-version
+    attributes:
+      label: Windows version
+      placeholder: "Windows 11 24H2"
+    validations:
+      required: true
+
+  - type: input
+    id: printer
+    attributes:
+      label: Printer
+      description: If the issue is related to printing, provide the exact printer model. Use "Not applicable" otherwise.
+      placeholder: "DYMO LabelWriter 550"
+
+  - type: input
+    id: label-profile
+    attributes:
+      label: Label profile
+      description: Provide the label dimensions, layout, and profile name when relevant.
+      placeholder: "89 × 41 mm, 2-up / custom profile"
+
+  - type: dropdown
+    id: qr
+    attributes:
+      label: QR
+      options:
+        - Enabled
+        - Disabled
+        - Not applicable
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-description
+    attributes:
+      label: Problem description
+      description: Describe the problem and when it occurs.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Provide a minimal, numbered sequence that reproduces the problem.
+      placeholder: |
+        1. Open...
+        2. Select...
+        3. Click...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual behavior
+      description: What happened instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: preflight-error
+    attributes:
+      label: Preflight or error message
+      description: Copy the complete message shown by the application, if available.
+
+  - type: textarea
+    id: logs-screenshots
+    attributes:
+      label: Logs or screenshots
+      description: Attach relevant logs or screenshots. Do not publish passwords, personal data, Asset IDs, or other sensitive information.
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other details that may help reproduce or diagnose the problem.
+
+  - type: checkboxes
+    id: security-confirmation
+    attributes:
+      label: Security confirmation
+      description: Security vulnerabilities must be reported using Private Vulnerability Reporting, not this form.
+      options:
+        - label: I have checked that this issue is not a security vulnerability.
+          required: true

@@ -137,6 +137,11 @@ legacy/                 reference PowerShell 2.4 implementation
 Please use [GitHub Issues](https://github.com/krzymianowski/EtykietyIT/issues)
 to report bugs or request changes.
 
+## Contributing and security
+
+- Contribution guidelines: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- Security policy and private vulnerability reporting: [`SECURITY.md`](SECURITY.md)
+
 ## License
 
 Etykiety IT is available under the MIT License. See [`LICENSE`](LICENSE).

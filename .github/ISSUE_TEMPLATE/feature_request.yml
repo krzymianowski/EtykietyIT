@@ -1,0 +1,65 @@
+name: Feature request
+description: Suggest an improvement or new capability for Etykiety IT.
+title: "[Feature] "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem-use-case
+    attributes:
+      label: Problem or use case
+      description: Describe the problem, workflow, or limitation this request would address. Focus on the need rather than only a specific UI control.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+      description: Describe how you think Etykiety IT could address the problem.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives-considered
+    attributes:
+      label: Alternatives considered
+      description: Describe any workarounds or alternative solutions you considered.
+
+  - type: textarea
+    id: beneficiaries
+    attributes:
+      label: Who would benefit?
+      description: Describe the users, organizations, or workflows that would benefit.
+
+  - type: dropdown
+    id: printing-hardware-impact
+    attributes:
+      label: Printing or hardware impact
+      description: Would this request affect printing geometry, printer support, calibration, QR codes, or hardware behavior?
+      options:
+        - "No"
+        - "Yes"
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: printing-requirements
+    attributes:
+      label: Printing or hardware requirements
+      description: If you selected Yes or Not sure, describe the relevant printer models, label sizes, drivers, or expected behavior.
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add examples, screenshots, or other information that may help evaluate the request.
+
+  - type: checkboxes
+    id: existing-issues
+    attributes:
+      label: Existing requests
+      options:
+        - label: I have checked existing Issues for a similar request.
+          required: true

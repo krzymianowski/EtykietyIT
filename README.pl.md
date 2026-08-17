@@ -139,6 +139,11 @@ legacy/                 referencyjna implementacja PowerShell 2.4
 Błędy i propozycje zmian można zgłaszać przez
 [GitHub Issues](https://github.com/krzymianowski/EtykietyIT/issues).
 
+## Współtworzenie i bezpieczeństwo
+
+- Zasady współtworzenia projektu: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- Polityka bezpieczeństwa i prywatne zgłaszanie podatności: [`SECURITY.md`](SECURITY.md)
+
 ## Licencja
 
 Etykiety IT jest udostępniany na licencji MIT. Zobacz plik
