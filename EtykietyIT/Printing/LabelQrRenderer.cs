@@ -1,4 +1,5 @@
 using System.Drawing.Drawing2D;
+using System.Globalization;
 using Net.Codecrete.QrCodeGenerator;
 
 namespace EtykietyIT.Printing;
@@ -10,6 +11,9 @@ internal static class LabelQrRenderer
     internal const float PreferredQrFootprintMm = 15.0f;
 
     private const float MillimetersPerInch = 25.4f;
+
+    private static readonly CultureInfo PolishCulture =
+        CultureInfo.GetCultureInfo("pl-PL");
 
     internal static QrCode CreateQrCode(string assetId)
     {
@@ -56,7 +60,8 @@ internal static class LabelQrRenderer
         if (!float.IsFinite(dpiX) || dpiX <= 0.0f)
         {
             throw new InvalidOperationException(
-                $"Drukarka zgłosiła nieprawidłową rozdzielczość poziomą: {dpiX} DPI.");
+                "Drukarka zgłosiła nieprawidłową rozdzielczość poziomą: " +
+                $"{dpiX.ToString("0.##", PolishCulture)} DPI.");
         }
 
         float dotSizeMm = MillimetersPerInch / dpiX;
@@ -69,11 +74,16 @@ internal static class LabelQrRenderer
         {
             float minimumFootprintMm =
                 totalModules * MinimumDotsPerModule * dotSizeMm;
+            string availableFootprintText =
+                availableFootprintMm.ToString("0.0", PolishCulture);
+            string dpiText = dpiX.ToString("0.##", PolishCulture);
+            string minimumFootprintText =
+                minimumFootprintMm.ToString("0.0", PolishCulture);
             throw new InvalidOperationException(
                 "QR nie mieści się w wybranym profilu etykiety. " +
-                $"Dostępne miejsce: {availableFootprintMm:0.0} mm. " +
-                $"Minimalny wymagany rozmiar przy {dpiX:0.##} DPI: " +
-                $"{minimumFootprintMm:0.0} mm " +
+                $"Dostępne miejsce: {availableFootprintText} mm. " +
+                $"Minimalny wymagany rozmiar przy {dpiText} DPI: " +
+                $"{minimumFootprintText} mm " +
                 $"({MinimumDotsPerModule} punkty na moduł). " +
                 $"Macierz: {qrModules} × {qrModules} modułów, " +
                 $"łącznie z quiet zone: {totalModules} × {totalModules}, " +

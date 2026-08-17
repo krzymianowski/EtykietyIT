@@ -1,4 +1,5 @@
 using System.Drawing.Printing;
+using System.Globalization;
 using System.Text;
 using EtykietyIT.Export;
 using EtykietyIT.Forms;
@@ -10,6 +11,9 @@ namespace EtykietyIT;
 
 public partial class MainForm : Form
 {
+    private static readonly CultureInfo PolishCulture =
+        CultureInfo.GetCultureInfo("pl-PL");
+
     private readonly SettingsService _settingsService;
     private readonly OrganizationProfileService _organizationProfileService;
     private readonly PrinterCalibrationService _printerCalibrationService;
@@ -893,14 +897,21 @@ public partial class MainForm : Form
             .AppendLine(printerName)
             .AppendLine()
             .AppendLine("Profil:")
-            .AppendLine(
-                $"{profile.Name} — {profile.WidthMm:0.#} × " +
-                $"{profile.HeightMm:0.#} mm — " +
-                $"{profile.Columns} × {profile.Rows}")
+            .AppendLine(string.Format(
+                PolishCulture,
+                "{0} — {1:0.#} × {2:0.#} mm — {3} × {4}",
+                profile.Name,
+                profile.WidthMm,
+                profile.HeightMm,
+                profile.Columns,
+                profile.Rows))
             .AppendLine()
             .AppendLine("Rozmiar pojedynczej etykiety:")
-            .AppendLine(
-                $"{result.CellWidthMm:0.0} × {result.CellHeightMm:0.0} mm")
+            .AppendLine(string.Format(
+                PolishCulture,
+                "{0:0.0} × {1:0.0} mm",
+                result.CellWidthMm,
+                result.CellHeightMm))
             .AppendLine()
             .AppendLine("Problemy:");
 

@@ -1,6 +1,7 @@
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 using System.Drawing.Text;
+using System.Globalization;
 using EtykietyIT.Services;
 using Net.Codecrete.QrCodeGenerator;
 
@@ -14,6 +15,9 @@ public sealed class LabelPrintabilityValidator
 
     private const float HundredthsInchToMillimeters = 0.254f;
     private const float GeometryToleranceMm = 0.01f;
+
+    private static readonly CultureInfo PolishCulture =
+        CultureInfo.GetCultureInfo("pl-PL");
 
     public LabelPrintabilityResult Validate(LabelPrintOptions options)
     {
@@ -248,7 +252,9 @@ public sealed class LabelPrintabilityValidator
                 AddIssue(
                     LabelPrintabilitySeverity.Error,
                     "CONTENT_AREA_TOO_SMALL",
-                    $"Obszar treści ma tylko {layoutWidth:0.0} × {layoutHeight:0.0} mm.");
+                    "Obszar treści ma tylko " +
+                    $"{FormatPolish(layoutWidth, "0.0")} × " +
+                    $"{FormatPolish(layoutHeight, "0.0")} mm.");
             }
 
             RectangleF titleRect;
@@ -303,7 +309,8 @@ public sealed class LabelPrintabilityValidator
                     AddIssue(
                         LabelPrintabilitySeverity.Error,
                         "QR_TEXT_AREA_TOO_NARROW",
-                        $"Po dodaniu QR obszar tekstu ma tylko {titleRect.Width:0.0} mm szerokości.");
+                        "Po dodaniu QR obszar tekstu ma tylko " +
+                        $"{FormatPolish(titleRect.Width, "0.0")} mm szerokości.");
                 }
 
                 QrCode qrCode = LabelQrRenderer.CreateQrCode(assetId);
@@ -686,8 +693,9 @@ public sealed class LabelPrintabilityValidator
             addIssue(
                 LabelPrintabilitySeverity.Error,
                 $"{codePrefix}_FONT_TOO_SMALL",
-                $"{fieldName} mieści się dopiero przy {fit.SizePt:0.##} pt; " +
-                $"wymagane minimum to {minimumReadablePt:0.##} pt.");
+                $"{fieldName} mieści się dopiero przy " +
+                $"{FormatPolish(fit.SizePt, "0.##")} pt; wymagane minimum to " +
+                $"{FormatPolish(minimumReadablePt, "0.##")} pt.");
             return;
         }
 
@@ -696,9 +704,15 @@ public sealed class LabelPrintabilityValidator
             addIssue(
                 LabelPrintabilitySeverity.Warning,
                 $"{codePrefix}_FONT_NEAR_MINIMUM",
-                $"{fieldName} użyje fontu {fit.SizePt:0.##} pt, blisko minimum " +
-                $"{minimumReadablePt:0.##} pt.");
+                $"{fieldName} użyje fontu " +
+                $"{FormatPolish(fit.SizePt, "0.##")} pt, blisko minimum " +
+                $"{FormatPolish(minimumReadablePt, "0.##")} pt.");
         }
+    }
+
+    private static string FormatPolish(float value, string format)
+    {
+        return value.ToString(format, PolishCulture);
     }
 
     private static int CalculatePhysicalDotsPerModule(

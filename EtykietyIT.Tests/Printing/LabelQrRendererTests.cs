@@ -1,5 +1,6 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Globalization;
 using EtykietyIT.Printing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Net.Codecrete.QrCodeGenerator;
@@ -107,6 +108,36 @@ public sealed class LabelQrRendererTests
             exception.Message,
             "Minimalny wymagany rozmiar przy 300 DPI: 9,8 mm");
         StringAssert.Contains(exception.Message, "4 punkty na moduł");
+    }
+
+    [TestMethod]
+    [DoNotParallelize]
+    public void CalculateLayout_UsesPolishFormattingUnderEnglishCulture()
+    {
+        CultureInfo previousCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+
+            InvalidOperationException exception = Assert.ThrowsExactly<
+                InvalidOperationException>(() =>
+                    LabelQrRenderer.CalculateLayout(
+                        21,
+                        300.0f,
+                        LabelRenderMode.Print,
+                        9.0f));
+
+            StringAssert.Contains(
+                exception.Message,
+                "Dostępne miejsce: 9,0 mm");
+            StringAssert.Contains(
+                exception.Message,
+                "Minimalny wymagany rozmiar przy 300 DPI: 9,8 mm");
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = previousCulture;
+        }
     }
 
     [TestMethod]
