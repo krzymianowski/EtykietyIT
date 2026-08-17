@@ -29,6 +29,7 @@ public partial class HistoryForm : Form
             throw new ArgumentNullException(nameof(xlsxHistoryExporter));
 
         InitializeComponent();
+        ApplicationIconProvider.Apply(this);
         InitializeGridColumns();
 
         dateFromDateTimePicker.Value = DateTime.Today.AddMonths(-1);

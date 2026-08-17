@@ -14,6 +14,7 @@ public sealed class AboutForm : Form
             throw new ArgumentNullException(nameof(applicationVersionService));
 
         InitializeLayout();
+        ApplicationIconProvider.Apply(this);
     }
 
     private void InitializeLayout()
@@ -168,6 +169,7 @@ public sealed class AboutForm : Form
             : $"Nie znaleziono pliku {fileName} w katalogu aplikacji.";
 
         using var dialog = new Form();
+        ApplicationIconProvider.Apply(dialog);
         dialog.SuspendLayout();
         dialog.Text = title;
         dialog.Font = new Font("Segoe UI", 9F);

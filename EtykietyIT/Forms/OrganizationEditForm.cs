@@ -29,6 +29,7 @@ public partial class OrganizationEditForm : Form
         Profile = profile;
 
         InitializeComponent();
+        ApplicationIconProvider.Apply(this);
         Text = windowTitle;
 
         organizationNameTextBox.Text = profile.Name;

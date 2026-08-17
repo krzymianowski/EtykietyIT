@@ -1,5 +1,6 @@
 using EtykietyIT.Bootstrap;
 using EtykietyIT.Diagnostics;
+using EtykietyIT.Forms;
 using EtykietyIT.Models;
 
 namespace EtykietyIT;
@@ -13,6 +14,7 @@ static class Program
 
         try
         {
+            ApplicationIconProvider.Initialize();
             var bootstrapper = new AppBootstrapper();
             AppServices services = bootstrapper.Build(arguments);
             using var uiDiagnostics = UiDiagnosticsService.StartIfRequested(
@@ -41,6 +43,10 @@ static class Program
                 "Etykiety IT",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
+        }
+        finally
+        {
+            ApplicationIconProvider.Shutdown();
         }
     }
 }

@@ -14,6 +14,7 @@ public partial class ProfilesForm : Form
             throw new ArgumentNullException(nameof(labelProfileService));
 
         InitializeComponent();
+        ApplicationIconProvider.Apply(this);
 
         Shown += ProfilesForm_Shown;
         profilesListView.SelectedIndexChanged += ProfilesListView_SelectedIndexChanged;

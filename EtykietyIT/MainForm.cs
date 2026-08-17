@@ -58,6 +58,7 @@ public partial class MainForm : Form
         _settings.Validate();
 
         InitializeComponent();
+        ApplicationIconProvider.Apply(this);
 
         organizationComboBox.SelectedIndexChanged +=
             OrganizationComboBox_SelectedIndexChanged;
@@ -412,6 +413,7 @@ public partial class MainForm : Form
                 StartPosition = FormStartPosition.CenterParent
             };
 
+            ApplicationIconProvider.Apply(previewDialog);
             previewDialog.ShowDialog(this);
         }
         catch (Exception exception)

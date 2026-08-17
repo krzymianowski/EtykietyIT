@@ -34,6 +34,7 @@ public partial class OrganizationsForm : Form
         _installedPrinters = installedPrinters.ToArray();
 
         InitializeComponent();
+        ApplicationIconProvider.Apply(this);
 
         Shown += OrganizationsForm_Shown;
         organizationsListView.SelectedIndexChanged +=

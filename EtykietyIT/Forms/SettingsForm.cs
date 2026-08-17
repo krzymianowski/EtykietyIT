@@ -20,6 +20,7 @@ internal partial class SettingsForm : Form
         Profile = profile;
 
         InitializeComponent();
+        ApplicationIconProvider.Apply(this);
 
         companyNameTextBox.Text = profile.CompanyName;
         assetIdPrefixTextBox.Text = profile.AssetId.Prefix;

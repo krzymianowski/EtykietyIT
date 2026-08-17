@@ -15,6 +15,7 @@ public partial class ProfileEditForm : Form
         Profile = profile;
 
         InitializeComponent();
+        ApplicationIconProvider.Apply(this);
         Text = windowTitle;
 
         nameTextBox.Text = profile.Name;
