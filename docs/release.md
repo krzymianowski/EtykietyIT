@@ -101,6 +101,18 @@ Get-FileHash .\artifacts\release\EtykietyIT-*.zip -Algorithm SHA256
 Wartości muszą odpowiadać sumom zapisanym w pliku i opublikowanym razem z
 artefaktami.
 
+## Wynik ręcznej walidacji 3.0.0-rc.1
+
+Release candidate `3.0.0-rc.1` został ręcznie przetestowany na trzech
+komputerach, w tym na komputerze z czystą instalacją Windows.
+
+Potwierdzony wynik:
+
+- tryb Standard — PASS,
+- tryb Portable — PASS,
+- uruchomienie self-contained — PASS,
+- podstawowa funkcjonalność aplikacji — PASS.
+
 ## Checklista czystego komputera
 
 ### Paczka i uruchomienie
