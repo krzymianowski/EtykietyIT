@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using EtykietyIT.Services;
 
 namespace EtykietyIT.Forms;
@@ -36,9 +37,10 @@ public sealed class AboutForm : Form
             ColumnCount = 1,
             Dock = DockStyle.Fill,
             Padding = new Padding(24, 20, 24, 20),
-            RowCount = 7
+            RowCount = 8
         };
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -76,6 +78,19 @@ public sealed class AboutForm : Form
                 "Licencja: MIT\r\n" +
                 CopyrightText
         };
+        const string repositoryLabelPrefix = "GitHub: ";
+        string repositoryLinkText =
+            repositoryLabelPrefix + ApplicationLinks.RepositoryUrl;
+        var repositoryLinkLabel = new LinkLabel
+        {
+            AutoSize = true,
+            LinkArea = new LinkArea(
+                repositoryLabelPrefix.Length,
+                ApplicationLinks.RepositoryUrl.Length),
+            Margin = new Padding(0, 0, 0, 14),
+            Text = repositoryLinkText
+        };
+        repositoryLinkLabel.LinkClicked += (_, _) => OpenRepository();
         var librariesGroupBox = new GroupBox
         {
             AutoSize = true,
@@ -127,8 +142,9 @@ public sealed class AboutForm : Form
         layout.Controls.Add(versionLabel, 0, 1);
         layout.Controls.Add(descriptionLabel, 0, 2);
         layout.Controls.Add(detailsLabel, 0, 3);
-        layout.Controls.Add(librariesGroupBox, 0, 4);
-        layout.Controls.Add(buttonsPanel, 0, 6);
+        layout.Controls.Add(repositoryLinkLabel, 0, 4);
+        layout.Controls.Add(librariesGroupBox, 0, 5);
+        layout.Controls.Add(buttonsPanel, 0, 7);
 
         layout.SizeChanged += (_, _) =>
         {
@@ -147,6 +163,27 @@ public sealed class AboutForm : Form
 
         ResumeLayout(false);
         PerformLayout();
+    }
+
+    private void OpenRepository()
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = ApplicationLinks.RepositoryUrl,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show(
+                this,
+                $"Nie udało się otworzyć repozytorium.\r\n\r\n{exception.Message}",
+                "Etykiety IT",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+        }
     }
 
     private static Button CreateButton(string text, Size minimumSize)

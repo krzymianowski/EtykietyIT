@@ -11,6 +11,8 @@
     <Version>3.0.0-rc.1</Version>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
     <FileVersion>3.0.0.0</FileVersion>
+    <RepositoryUrl>https://github.com/krzymianowski/EtykietyIT</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>

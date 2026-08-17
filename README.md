@@ -5,6 +5,12 @@ inwentarzowych dla urządzeń i zasobów IT.
 
 > Status projektu: `3.0.0-rc.1` — release candidate
 
+## Linki
+
+- Repozytorium: [github.com/krzymianowski/EtykietyIT](https://github.com/krzymianowski/EtykietyIT)
+- Wydania: [GitHub Releases](https://github.com/krzymianowski/EtykietyIT/releases)
+- Zgłaszanie problemów: [GitHub Issues](https://github.com/krzymianowski/EtykietyIT/issues)
+
 ## Funkcje
 
 - automatyczna numeracja Asset ID,
