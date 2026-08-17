@@ -3,7 +3,7 @@
 Etykiety IT to niewielka aplikacja Windows do tworzenia i drukowania etykiet
 inwentarzowych dla urządzeń i zasobów IT.
 
-> Status projektu: `3.0.0-rc.1` — release candidate
+> Wersja: `3.0.0`
 
 ## Linki
 
@@ -28,9 +28,9 @@ inwentarzowych dla urządzeń i zasobów IT.
 - eksport widocznych rekordów do CSV i XLSX,
 - tryb danych Standard oraz Portable.
 
-## Dystrybucja release candidate
+## Dystrybucja
 
-Release candidate jest publikowany dla Windows x64 jako aplikacja
+Etykiety IT 3.0.0 jest publikowany dla Windows x64 jako aplikacja
 self-contained. Do jego uruchomienia nie trzeba instalować .NET Desktop
 Runtime ani .NET SDK. Microsoft Excel nie jest wymagany do tworzenia plików
 XLSX.
@@ -40,7 +40,9 @@ Powstają dwa warianty ZIP zbudowane z tych samych plików aplikacji:
 - Standard — dane użytkownika są zapisywane w `%LOCALAPPDATA%`,
 - Portable — zawiera plik `portable.mode`, a dane są zapisywane obok aplikacji.
 
-Release candidate nie jest obecnie podpisywany cyfrowo.
+Binaria Etykiety IT 3.0.0 nie są podpisane cyfrowo. Windows może wyświetlić
+ostrzeżenie Microsoft Defender SmartScreen. Integralność paczek można
+zweryfikować za pomocą opublikowanych sum SHA-256.
 
 ## Wymagania
 

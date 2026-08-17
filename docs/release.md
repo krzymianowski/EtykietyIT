@@ -22,7 +22,7 @@ SDK. Proces nie przejdzie automatycznie na nowszy patch ani feature band, dzięk
 czemu wersja runtime'u w paczce self-contained nie zmieni się bez jawnej zmiany
 `global.json` i ponownej walidacji release.
 
-## Lokalny build release candidate
+## Lokalny build wydania
 
 W katalogu głównym repozytorium uruchom:
 
@@ -46,10 +46,11 @@ Opcjonalny parametr `ExpectedVersion` blokuje pakowanie, gdy oczekiwana wersja
 nie odpowiada właściwości `Version` w projekcie:
 
 ```powershell
-.\scripts\build-release.ps1 -ExpectedVersion 3.0.0-rc.1
+.\scripts\build-release.ps1 -ExpectedVersion 3.0.0
 ```
 
-Workflow wykorzystuje ten mechanizm do porównania wersji z nazwą tagu RC.
+Workflow wykorzystuje ten mechanizm do porównania wersji z nazwą tagu —
+zarówno dla release candidate, jak i wydania finalnego.
 
 ## Konfiguracja publish
 
@@ -69,12 +70,12 @@ osobnej analizy i pełnej ponownej walidacji artefaktów.
 
 ## Artefakty
 
-Dla wersji `3.0.0-rc.1` powstają:
+Dla wersji `3.0.0` powstają:
 
 ```text
 artifacts/release/
-  EtykietyIT-3.0.0-rc.1-win-x64.zip
-  EtykietyIT-3.0.0-rc.1-win-x64-portable.zip
+  EtykietyIT-3.0.0-win-x64.zip
+  EtykietyIT-3.0.0-win-x64-portable.zip
   SHA256SUMS.txt
   publish/
   staging/
@@ -112,6 +113,10 @@ Potwierdzony wynik:
 - tryb Portable — PASS,
 - uruchomienie self-contained — PASS,
 - podstawowa funkcjonalność aplikacji — PASS.
+
+Finalne wydanie `3.0.0` powstaje bez zmian funkcjonalnych z zatwierdzonego
+release candidate `3.0.0-rc.1`. Zmianie podlegają wyłącznie metadane wersji i
+dokumentacja wydania.
 
 ## Checklista czystego komputera
 
@@ -169,13 +174,15 @@ Potwierdzony wynik:
 
 Po zaakceptowaniu release candidate:
 
-1. zmień wyłącznie `Version` z `3.0.0-rc.1` na `3.0.0`,
-2. zmień nagłówek CHANGELOG na `3.0.0` i zaktualizuj status README,
-3. wykonaj `dotnet build` i `dotnet test`,
-4. uruchom `build-release.ps1 -ExpectedVersion 3.0.0`,
-5. zweryfikuj finalne ZIP-y i sumy SHA-256,
-6. utwórz tag `v3.0.0` na dokładnym, zaakceptowanym commicie,
+1. zmień `Version` z `3.0.0-rc.1` na `3.0.0` i zaktualizuj dokumentację,
+2. wykonaj `dotnet build` i `dotnet test`,
+3. utwórz i wypchnij zaakceptowany commit `Release 3.0.0`,
+4. z czystego commita uruchom
+   `build-release.ps1 -ExpectedVersion 3.0.0`,
+5. zweryfikuj wersję binarium, zawartość ZIP-ów i sumy SHA-256,
+6. utwórz tag `v3.0.0` wskazujący dokładnie commit wydania i wypchnij tag,
 7. dołącz oba ZIP-y i `SHA256SUMS.txt` do GitHub Release.
 
 Tag i właściwość `Version` muszą być identyczne po usunięciu początkowego
-znaku `v` z nazwy tagu.
+znaku `v` z nazwy tagu. `InformationalVersion` finalnego binarium musi
+zawierać hash dokładnie tego samego commita, na który wskazuje tag.

@@ -1,16 +1,16 @@
-name: Build release candidate
+name: Build release artifacts
 
 on:
   workflow_dispatch:
   push:
     tags:
-      - "v*-rc.*"
+      - "v*"
 
 permissions:
   contents: read
 
 jobs:
-  build-release-candidate:
+  build-release:
     runs-on: windows-latest
 
     steps:

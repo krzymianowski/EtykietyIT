@@ -8,7 +8,7 @@
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <ApplicationIcon>Assets\EtykietyIT.ico</ApplicationIcon>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Version>3.0.0-rc.1</Version>
+    <Version>3.0.0</Version>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
     <FileVersion>3.0.0.0</FileVersion>
     <RepositoryUrl>https://github.com/krzymianowski/EtykietyIT</RepositoryUrl>

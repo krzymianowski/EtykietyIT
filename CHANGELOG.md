@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.0.0-rc.1
+## 3.0.0 — 2026-08-17
 
 - przeniesienie aplikacji i zweryfikowanego silnika drukowania z PowerShell do
   C# / .NET 10 / Windows Forms,
