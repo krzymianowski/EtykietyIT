@@ -8,6 +8,9 @@ kalibrację drukarek i historię wydruków.
 
 > Aktualne wydanie: `3.0.0`
 
+**Język:** Etykiety IT 3.0.0 posiada obecnie wyłącznie polski interfejs
+użytkownika. Obsługa języka angielskiego jest planowana w wersji 3.1.0.
+
 ## Funkcje
 
 - profile organizacji z niezależną numeracją Asset ID,
@@ -24,6 +27,14 @@ kalibrację drukarek i historię wydruków.
 - eksport widocznych rekordów historii do CSV i XLSX,
 - tryb Standard i tryb Portable,
 - obsługa High DPI w trybie PerMonitorV2.
+
+## Plan rozwoju
+
+Planowane dla 3.1.0:
+
+- angielski interfejs użytkownika,
+- wybór języka Polski / English,
+- automatyczny wybór języka na podstawie języka Windows.
 
 ## Zweryfikowane drukarki
 

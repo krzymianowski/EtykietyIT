@@ -7,6 +7,9 @@ with QR codes, organization profiles, printer calibration, and print history.
 
 > Current release: `3.0.0`
 
+**Language:** Etykiety IT 3.0.0 currently provides a Polish-language user
+interface only. English UI support is planned for version 3.1.0.
+
 ## Features
 
 - organization profiles with independent Asset ID numbering,
@@ -23,6 +26,14 @@ with QR codes, organization profiles, printer calibration, and print history.
 - export of visible history records to CSV and XLSX,
 - Standard mode and Portable mode,
 - High DPI support using PerMonitorV2.
+
+## Roadmap
+
+Planned for 3.1.0:
+
+- English user interface,
+- Polish / English language selection,
+- automatic language selection based on Windows language.
 
 ## Verified printers
 

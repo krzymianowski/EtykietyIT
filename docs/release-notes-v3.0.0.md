@@ -59,6 +59,11 @@ Portable directory must be writable.
 The packages are self-contained. Installing .NET Desktop Runtime, .NET SDK,
 or Microsoft Excel is not required.
 
+### Language
+
+Etykiety IT 3.0.0 currently provides a Polish-language user interface.
+English UI support is planned for version 3.1.0.
+
 ## Unsigned binaries
 
 The Etykiety IT 3.0.0 binaries are not digitally signed. Microsoft Defender
@@ -156,6 +161,11 @@ Katalog wersji Portable musi być zapisywalny.
 
 Pakiety są self-contained. Instalowanie .NET Desktop Runtime, .NET SDK ani
 Microsoft Excel nie jest wymagane.
+
+### Język
+
+Etykiety IT 3.0.0 posiada obecnie wyłącznie polski interfejs użytkownika.
+Obsługa języka angielskiego jest planowana w wersji 3.1.0.
 
 ## Brak podpisu cyfrowego
 
