@@ -73,8 +73,7 @@ public sealed class AboutForm : Form
             Margin = new Padding(0, 0, 0, 14),
             Text = "Technologia: C# / .NET 10 / Windows Forms\r\n" +
                 "Licencja: MIT\r\n" +
-                $"{CopyrightText}\r\n" +
-                "Repozytorium GitHub: adres nie został jeszcze ustalony."
+                CopyrightText
         };
         var librariesGroupBox = new GroupBox
         {
@@ -90,6 +89,7 @@ public sealed class AboutForm : Form
             AutoSize = true,
             Dock = DockStyle.Top,
             Text = "DocumentFormat.OpenXml 3.5.1 — MIT\r\n" +
+                "Net.Codecrete.QrCodeGenerator 3.1.0 — MIT\r\n" +
                 "Szczegółowe informacje znajdują się w THIRD-PARTY-NOTICES.md."
         };
         librariesGroupBox.Controls.Add(librariesLabel);

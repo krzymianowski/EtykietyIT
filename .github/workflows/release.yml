@@ -1,0 +1,58 @@
+name: Build release candidate
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*-rc.*"
+
+permissions:
+  contents: read
+
+jobs:
+  build-release-candidate:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pinned .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Build, test, publish and package
+        shell: pwsh
+        run: |
+          $scriptArguments = @{}
+          if ($env:GITHUB_REF_TYPE -eq "tag") {
+            if ($env:GITHUB_REF_NAME -notmatch '^v(?<version>.+)$') {
+              throw "Nieprawidłowa nazwa tagu: $env:GITHUB_REF_NAME"
+            }
+
+            $scriptArguments.ExpectedVersion = $Matches.version
+          }
+
+          .\scripts\build-release.ps1 @scriptArguments
+
+      - name: Upload Standard ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: EtykietyIT-win-x64
+          path: artifacts/release/EtykietyIT-*-win-x64.zip
+          if-no-files-found: error
+
+      - name: Upload Portable ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: EtykietyIT-win-x64-portable
+          path: artifacts/release/EtykietyIT-*-win-x64-portable.zip
+          if-no-files-found: error
+
+      - name: Upload SHA-256 checksums
+        uses: actions/upload-artifact@v4
+        with:
+          name: EtykietyIT-SHA256SUMS
+          path: artifacts/release/SHA256SUMS.txt
+          if-no-files-found: error

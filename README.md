@@ -3,7 +3,7 @@
 Etykiety IT to niewielka aplikacja Windows do tworzenia i drukowania etykiet
 inwentarzowych dla urządzeń i zasobów IT.
 
-> Status projektu: development — `3.0.0-dev`
+> Status projektu: `3.0.0-rc.1` — release candidate
 
 ## Funkcje
 
@@ -22,17 +22,34 @@ inwentarzowych dla urządzeń i zasobów IT.
 - eksport widocznych rekordów do CSV i XLSX,
 - tryb danych Standard oraz Portable.
 
+## Dystrybucja release candidate
+
+Release candidate jest publikowany dla Windows x64 jako aplikacja
+self-contained. Do jego uruchomienia nie trzeba instalować .NET Desktop
+Runtime ani .NET SDK. Microsoft Excel nie jest wymagany do tworzenia plików
+XLSX.
+
+Powstają dwa warianty ZIP zbudowane z tych samych plików aplikacji:
+
+- Standard — dane użytkownika są zapisywane w `%LOCALAPPDATA%`,
+- Portable — zawiera plik `portable.mode`, a dane są zapisywane obok aplikacji.
+
+Release candidate nie jest obecnie podpisywany cyfrowo.
+
 ## Wymagania
 
-- Windows,
-- .NET 10 Desktop Runtime do uruchomienia aplikacji,
-- .NET 10 SDK do budowania projektu.
+- 64-bitowy Windows obsługiwany przez .NET 10,
+- .NET SDK 10.0.400 wyłącznie do budowania projektu.
 
-Aplikacja używa standardowego systemu drukowania Windows i nie jest ograniczona
-wyłącznie do urządzeń DYMO. Fizyczne testy geometrii i kalibracji wykonano na:
+Aplikacja używa standardowego systemu drukowania Windows i może współpracować
+z różnymi drukarkami zainstalowanymi w systemie. Fizyczną walidację wydruku,
+geometrii, kalibracji, QR i preflightu wykonano na:
 
 - DYMO LabelWriter 450,
 - DYMO LabelWriter 550.
+
+Walidacja sprzętowa innych modeli drukarek Windows nie została jeszcze
+przeprowadzona.
 
 Szczegóły testów sprzętowych znajdują się w
 [`docs/printing-validation.md`](docs/printing-validation.md).

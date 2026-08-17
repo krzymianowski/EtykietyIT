@@ -12,7 +12,7 @@ public sealed class ApplicationVersionServiceTests
     {
         var service = new ApplicationVersionService();
 
-        Assert.AreEqual("3.0.0-dev", service.UserVersion);
+        Assert.AreEqual("3.0.0-rc.1", service.UserVersion);
         Assert.IsFalse(string.IsNullOrWhiteSpace(service.DiagnosticVersion));
         Assert.StartsWith(service.UserVersion, service.DiagnosticVersion);
         Assert.IsFalse(Regex.IsMatch(
