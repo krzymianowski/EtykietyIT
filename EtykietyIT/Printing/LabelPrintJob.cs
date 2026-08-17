@@ -14,6 +14,7 @@ public sealed class LabelPrintJob : IDisposable
     private readonly PaperSelection _paperSelection;
     private readonly StringFormat _center;
     private readonly Pen _cutPen;
+    private readonly float? _previewPrinterDpiX;
 
     private int _index;
     private bool _disposed;
@@ -40,6 +41,21 @@ public sealed class LabelPrintJob : IDisposable
         Document.DefaultPageSettings.PaperSize = _paperSelection.PaperSize;
         Document.DefaultPageSettings.Landscape = _paperSelection.Landscape;
         Document.DefaultPageSettings.Margins = new Margins(0, 0, 0, 0);
+
+        _previewPrinterDpiX = options.Content.QrEnabled &&
+            options.RenderMode == LabelRenderMode.Preview
+            ? TryGetPrinterDpiX(Document)
+            : null;
+
+        try
+        {
+            ValidateQrForPhysicalPrint(options, Document);
+        }
+        catch
+        {
+            Document.Dispose();
+            throw;
+        }
 
         _center = new StringFormat
         {
@@ -108,7 +124,7 @@ public sealed class LabelPrintJob : IDisposable
         }
     }
 
-    private static PaperSelection SelectPaperSize(
+    internal static PaperSelection SelectPaperSize(
         PrinterSettings printerSettings,
         double widthMm,
         double heightMm)
@@ -303,99 +319,345 @@ public sealed class LabelPrintJob : IDisposable
                 _options.Content.AssetIdPrefix,
                 _options.Content.AssetIdDigits);
 
-            float titleY = layoutY0 + layoutHeight * 0.07f;
-            float titleHeight = Math.Max(3.0f, layoutHeight * 0.14f);
-
-            float numberY = layoutY0 + layoutHeight * 0.23f;
-            float numberHeight = Math.Max(6.0f, layoutHeight * 0.38f);
-
-            float barHeight = Math.Max(5.0f, layoutHeight * 0.19f);
-            float barY =
-                layoutY1 - barHeight - Math.Max(0.8f, layoutHeight * 0.04f);
-
-            var titleRect = new RectangleF(
-                layoutX0,
-                titleY,
-                layoutWidth,
-                titleHeight);
-            var numberRect = new RectangleF(
-                layoutX0,
-                numberY,
-                layoutWidth,
-                numberHeight);
-            var barRect = new RectangleF(
-                layoutX0,
-                barY,
-                layoutWidth,
-                barHeight);
-
-            float titleMax =
-                Math.Min(9.0f, Math.Max(5.0f, layoutHeight * 0.18f));
-            float numberMax =
-                Math.Min(24.0f, Math.Max(8.0f, layoutHeight * 0.50f));
-            float companyMax =
-                Math.Min(9.0f, Math.Max(4.5f, layoutHeight * 0.16f));
-
-            Font titleFont = CreateFittingFont(
-                graphics,
-                "Nr inwentarzowy",
-                titleRect,
-                "Arial",
-                FontStyle.Regular,
-                titleMax,
-                4.0f);
-            Font numberFont = CreateFittingFont(
-                graphics,
-                assetId,
-                numberRect,
-                "Arial",
-                FontStyle.Bold,
-                numberMax,
-                6.0f);
-            Font companyFont = CreateFittingFont(
-                graphics,
-                _options.Content.CompanyName,
-                barRect,
-                "Arial",
-                FontStyle.Bold,
-                companyMax,
-                3.5f);
-
-            try
+            if (_options.Content.QrEnabled)
             {
-                graphics.DrawString(
-                    "Nr inwentarzowy",
-                    titleFont,
-                    Brushes.Black,
-                    titleRect,
-                    _center);
-
-                graphics.DrawString(
+                DrawQrEnabledLabel(
+                    graphics,
                     assetId,
-                    numberFont,
-                    Brushes.Black,
-                    numberRect,
-                    _center);
-
-                graphics.FillRectangle(Brushes.Black, barRect);
-                graphics.DrawString(
-                    _options.Content.CompanyName,
-                    companyFont,
-                    Brushes.White,
-                    barRect,
-                    _center);
+                    layoutX0,
+                    layoutX1,
+                    layoutY0,
+                    layoutY1,
+                    layoutWidth,
+                    layoutHeight);
             }
-            finally
+            else
             {
-                titleFont.Dispose();
-                numberFont.Dispose();
-                companyFont.Dispose();
+                float titleY = layoutY0 + layoutHeight * 0.07f;
+                float titleHeight = Math.Max(3.0f, layoutHeight * 0.14f);
+
+                float numberY = layoutY0 + layoutHeight * 0.23f;
+                float numberHeight = Math.Max(6.0f, layoutHeight * 0.38f);
+
+                float barHeight = Math.Max(5.0f, layoutHeight * 0.19f);
+                float barY =
+                    layoutY1 - barHeight - Math.Max(0.8f, layoutHeight * 0.04f);
+
+                var titleRect = new RectangleF(
+                    layoutX0,
+                    titleY,
+                    layoutWidth,
+                    titleHeight);
+                var numberRect = new RectangleF(
+                    layoutX0,
+                    numberY,
+                    layoutWidth,
+                    numberHeight);
+                var barRect = new RectangleF(
+                    layoutX0,
+                    barY,
+                    layoutWidth,
+                    barHeight);
+
+                float titleMax =
+                    Math.Min(9.0f, Math.Max(5.0f, layoutHeight * 0.18f));
+                float numberMax =
+                    Math.Min(24.0f, Math.Max(8.0f, layoutHeight * 0.50f));
+                float companyMax =
+                    Math.Min(9.0f, Math.Max(4.5f, layoutHeight * 0.16f));
+
+                Font titleFont = CreateFittingFont(
+                    graphics,
+                    "Nr inwentarzowy",
+                    titleRect,
+                    "Arial",
+                    FontStyle.Regular,
+                    titleMax,
+                    4.0f);
+                Font numberFont = CreateFittingFont(
+                    graphics,
+                    assetId,
+                    numberRect,
+                    "Arial",
+                    FontStyle.Bold,
+                    numberMax,
+                    6.0f);
+                Font companyFont = CreateFittingFont(
+                    graphics,
+                    _options.Content.CompanyName,
+                    barRect,
+                    "Arial",
+                    FontStyle.Bold,
+                    companyMax,
+                    3.5f);
+
+                try
+                {
+                    graphics.DrawString(
+                        "Nr inwentarzowy",
+                        titleFont,
+                        Brushes.Black,
+                        titleRect,
+                        _center);
+
+                    graphics.DrawString(
+                        assetId,
+                        numberFont,
+                        Brushes.Black,
+                        numberRect,
+                        _center);
+
+                    graphics.FillRectangle(Brushes.Black, barRect);
+                    graphics.DrawString(
+                        _options.Content.CompanyName,
+                        companyFont,
+                        Brushes.White,
+                        barRect,
+                        _center);
+                }
+                finally
+                {
+                    titleFont.Dispose();
+                    numberFont.Dispose();
+                    companyFont.Dispose();
+                }
             }
 
             _index++;
         }
 
         e.HasMorePages = _index < _options.Quantity;
+    }
+
+    private static void ValidateQrForPhysicalPrint(
+        LabelPrintOptions options,
+        PrintDocument document)
+    {
+        if (!options.Content.QrEnabled ||
+            options.RenderMode != LabelRenderMode.Print)
+        {
+            return;
+        }
+
+        using Graphics measurementGraphics =
+            document.PrinterSettings.CreateMeasurementGraphics(
+                document.DefaultPageSettings);
+        measurementGraphics.PageUnit = GraphicsUnit.Millimeter;
+
+        PageSettings pageSettings = document.DefaultPageSettings;
+        float pageWidth =
+            pageSettings.Bounds.Width * HundredthsInchToMillimeters;
+        float pageHeight =
+            pageSettings.Bounds.Height * HundredthsInchToMillimeters;
+
+        if (pageWidth <= 0)
+        {
+            pageWidth = (float)options.WidthMm;
+        }
+
+        if (pageHeight <= 0)
+        {
+            pageHeight = (float)options.HeightMm;
+        }
+
+        float hardLeft =
+            pageSettings.HardMarginX * HundredthsInchToMillimeters;
+        float hardTop =
+            pageSettings.HardMarginY * HundredthsInchToMillimeters;
+        float printableWidth = measurementGraphics.VisibleClipBounds.Width;
+        float printableHeight = measurementGraphics.VisibleClipBounds.Height;
+        float hardRight = pageWidth - hardLeft - printableWidth;
+        float hardBottom = pageHeight - hardTop - printableHeight;
+
+        if (hardLeft < 0 || hardLeft > pageWidth / 2.0f)
+        {
+            hardLeft = 0.0f;
+        }
+
+        if (hardTop < 0 || hardTop > pageHeight / 2.0f)
+        {
+            hardTop = 0.0f;
+        }
+
+        if (hardRight < 0 || hardRight > pageWidth / 2.0f)
+        {
+            hardRight = 0.0f;
+        }
+
+        if (hardBottom < 0 || hardBottom > pageHeight / 2.0f)
+        {
+            hardBottom = 0.0f;
+        }
+
+        float safeEdgeX = Math.Max(1.0f, Math.Max(hardLeft, hardRight));
+        float safeEdgeY = Math.Max(1.0f, Math.Max(hardTop, hardBottom));
+        int slotsPerPage = options.Columns * options.Rows;
+
+        for (int index = 0; index < options.Quantity; index++)
+        {
+            int slot = index % slotsPerPage;
+            float maxFootprintMm = CalculateAvailableQrFootprint(
+                pageWidth,
+                pageHeight,
+                options.Columns,
+                options.Rows,
+                safeEdgeX,
+                safeEdgeY,
+                slot);
+            string assetId = AssetIdFormatter.Format(
+                options.StartNumber + index,
+                options.Content.AssetIdPrefix,
+                options.Content.AssetIdDigits);
+            LabelQrRenderer.ValidatePhysicalPrint(
+                assetId,
+                measurementGraphics.DpiX,
+                maxFootprintMm);
+        }
+    }
+
+    private static float? TryGetPrinterDpiX(PrintDocument document)
+    {
+        try
+        {
+            using Graphics measurementGraphics =
+                document.PrinterSettings.CreateMeasurementGraphics(
+                    document.DefaultPageSettings);
+            return measurementGraphics.DpiX;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    internal static float CalculateAvailableQrFootprint(
+        float pageWidth,
+        float pageHeight,
+        int columns,
+        int rows,
+        float safeEdgeX,
+        float safeEdgeY,
+        int slot)
+    {
+        float cellWidth = pageWidth / columns;
+        float cellHeight = pageHeight / rows;
+        int column = slot % columns;
+        int row = slot / columns;
+
+        float cellX0 = column * cellWidth;
+        float cellX1 = (column + 1) * cellWidth;
+        float cellY0 = row * cellHeight;
+        float cellY1 = (row + 1) * cellHeight;
+
+        float cellPadX = Math.Max(0.8f, Math.Min(1.5f, cellWidth * 0.035f));
+        float cellPadY = Math.Max(0.8f, Math.Min(1.2f, cellHeight * 0.035f));
+
+        float layoutX0 = Math.Max(cellX0 + cellPadX, safeEdgeX);
+        float layoutX1 = Math.Min(cellX1 - cellPadX, pageWidth - safeEdgeX);
+        float layoutY0 = Math.Max(cellY0 + cellPadY, safeEdgeY);
+        float layoutY1 = Math.Min(cellY1 - cellPadY, pageHeight - safeEdgeY);
+        float layoutWidth = layoutX1 - layoutX0;
+        float layoutHeight = layoutY1 - layoutY0;
+
+        LabelQrLayoutGeometry geometry = LabelQrLayoutGeometry.Calculate(
+            layoutX0,
+            layoutX1,
+            layoutY0,
+            layoutY1);
+        return geometry.AvailableQrFootprintMm;
+    }
+
+    private void DrawQrEnabledLabel(
+        Graphics graphics,
+        string assetId,
+        float layoutX0,
+        float layoutX1,
+        float layoutY0,
+        float layoutY1,
+        float layoutWidth,
+        float layoutHeight)
+    {
+        LabelQrLayoutGeometry geometry = LabelQrLayoutGeometry.Calculate(
+            layoutX0,
+            layoutX1,
+            layoutY0,
+            layoutY1);
+        if (geometry.TitleRect.Width <
+            LabelQrLayoutGeometry.MinimumTextWidthMm)
+        {
+            throw new InvalidOperationException(
+                "Obszar tekstu jest zbyt wąski dla układu etykiety z QR.");
+        }
+
+        float titleMax =
+            Math.Min(9.0f, Math.Max(5.0f, layoutHeight * 0.18f));
+        float numberMax =
+            Math.Min(24.0f, Math.Max(8.0f, layoutHeight * 0.50f));
+        float companyMax =
+            Math.Min(9.0f, Math.Max(4.5f, layoutHeight * 0.16f));
+
+        Font titleFont = CreateFittingFont(
+            graphics,
+            "Nr inwentarzowy",
+            geometry.TitleRect,
+            "Arial",
+            FontStyle.Regular,
+            titleMax,
+            4.0f);
+        Font numberFont = CreateFittingFont(
+            graphics,
+            assetId,
+            geometry.AssetIdRect,
+            "Arial",
+            FontStyle.Bold,
+            numberMax,
+            6.0f);
+        Font companyFont = CreateFittingFont(
+            graphics,
+            _options.Content.CompanyName,
+            geometry.CompanyBarRect,
+            "Arial",
+            FontStyle.Bold,
+            companyMax,
+            3.5f);
+
+        try
+        {
+            LabelQrRenderer.Draw(
+                graphics,
+                assetId,
+                geometry.QrRect,
+                _options.RenderMode,
+                _previewPrinterDpiX);
+
+            graphics.DrawString(
+                "Nr inwentarzowy",
+                titleFont,
+                Brushes.Black,
+                geometry.TitleRect,
+                _center);
+
+            graphics.DrawString(
+                assetId,
+                numberFont,
+                Brushes.Black,
+                geometry.AssetIdRect,
+                _center);
+
+            graphics.FillRectangle(Brushes.Black, geometry.CompanyBarRect);
+            graphics.DrawString(
+                _options.Content.CompanyName,
+                companyFont,
+                Brushes.White,
+                geometry.CompanyBarRect,
+                _center);
+        }
+        finally
+        {
+            titleFont.Dispose();
+            numberFont.Dispose();
+            companyFont.Dispose();
+        }
     }
 
     private static Font CreateFittingFont(

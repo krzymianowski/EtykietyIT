@@ -22,6 +22,8 @@ public sealed record OrganizationProfile
 
     public string? DefaultPrinterName { get; init; }
 
+    public bool DefaultQrEnabled { get; init; }
+
     public void Validate()
     {
         if (SchemaVersion != CurrentSchemaVersion)

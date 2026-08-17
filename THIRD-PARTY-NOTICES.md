@@ -17,6 +17,18 @@ w paczkach NuGet.
 Biblioteka jest używana do tworzenia i sprawdzania eksportów historii w
 formacie XLSX bez wymagania instalacji Microsoft Excel.
 
+### Net.Codecrete.QrCodeGenerator
+
+- Version: 3.1.0
+- License: MIT
+- Project: QR Code Generator for .NET
+- Repository: https://github.com/manuelbl/QrCodeGenerator
+- NuGet: https://www.nuget.org/packages/Net.Codecrete.QrCodeGenerator/3.1.0
+
+Biblioteka jest używana do kodowania Asset ID w macierz QR. Aplikacja rysuje
+moduły bezpośrednio przez `System.Drawing.Graphics`; nie używa bitmapowego
+renderera biblioteki.
+
 ## Development dependencies
 
 Poniższe pakiety są używane wyłącznie podczas budowania i uruchamiania testów.

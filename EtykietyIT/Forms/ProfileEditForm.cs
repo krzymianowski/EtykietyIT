@@ -24,6 +24,12 @@ public partial class ProfileEditForm : Form
         rowsNumericUpDown.Value = profile.Rows;
         drawCutLinesCheckBox.Checked = profile.DrawCutLines;
 
+        widthNumericUpDown.ValueChanged += GeometryValueChanged;
+        heightNumericUpDown.ValueChanged += GeometryValueChanged;
+        columnsNumericUpDown.ValueChanged += GeometryValueChanged;
+        rowsNumericUpDown.ValueChanged += GeometryValueChanged;
+        UpdateCellSizeInformation();
+
         saveButton.Click += SaveButton_Click;
         cancelButton.Click += CancelButton_Click;
     }
@@ -64,5 +70,20 @@ public partial class ProfileEditForm : Form
     {
         DialogResult = DialogResult.Cancel;
         Close();
+    }
+
+    private void GeometryValueChanged(object? sender, EventArgs e)
+    {
+        UpdateCellSizeInformation();
+    }
+
+    private void UpdateCellSizeInformation()
+    {
+        decimal cellWidth =
+            widthNumericUpDown.Value / columnsNumericUpDown.Value;
+        decimal cellHeight =
+            heightNumericUpDown.Value / rowsNumericUpDown.Value;
+        cellSizeLabel.Text =
+            $"Rozmiar pojedynczej etykiety: {cellWidth:0.0} × {cellHeight:0.0} mm";
     }
 }

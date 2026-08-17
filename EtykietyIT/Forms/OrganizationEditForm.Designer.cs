@@ -32,6 +32,7 @@ partial class OrganizationEditForm
         defaultLabelProfileComboBox = new ComboBox();
         defaultPrinterLabel = new Label();
         defaultPrinterComboBox = new ComboBox();
+        defaultQrCheckBox = new CheckBox();
         buttonsPanel = new FlowLayoutPanel();
         saveButton = new Button();
         cancelButton = new Button();
@@ -60,11 +61,13 @@ partial class OrganizationEditForm
         mainLayoutPanel.Controls.Add(defaultLabelProfileComboBox, 1, 5);
         mainLayoutPanel.Controls.Add(defaultPrinterLabel, 0, 6);
         mainLayoutPanel.Controls.Add(defaultPrinterComboBox, 1, 6);
-        mainLayoutPanel.Controls.Add(buttonsPanel, 0, 8);
+        mainLayoutPanel.Controls.Add(defaultQrCheckBox, 1, 7);
+        mainLayoutPanel.Controls.Add(buttonsPanel, 0, 9);
         mainLayoutPanel.SetColumnSpan(buttonsPanel, 2);
         mainLayoutPanel.Dock = DockStyle.Fill;
         mainLayoutPanel.Padding = new Padding(20);
-        mainLayoutPanel.RowCount = 9;
+        mainLayoutPanel.RowCount = 10;
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -163,6 +166,16 @@ partial class OrganizationEditForm
         defaultPrinterComboBox.Name = "defaultPrinterComboBox";
         defaultPrinterComboBox.TabIndex = 6;
         //
+        // defaultQrCheckBox
+        //
+        defaultQrCheckBox.Anchor = AnchorStyles.Left;
+        defaultQrCheckBox.AutoSize = true;
+        defaultQrCheckBox.Margin = new Padding(0, 3, 0, 10);
+        defaultQrCheckBox.Name = "defaultQrCheckBox";
+        defaultQrCheckBox.TabIndex = 7;
+        defaultQrCheckBox.Text = "Domyślnie drukuj QR z Asset ID";
+        defaultQrCheckBox.UseVisualStyleBackColor = true;
+        //
         // buttonsPanel
         //
         buttonsPanel.AutoSize = true;
@@ -235,6 +248,7 @@ partial class OrganizationEditForm
     private ComboBox defaultLabelProfileComboBox;
     private Label defaultPrinterLabel;
     private ComboBox defaultPrinterComboBox;
+    private CheckBox defaultQrCheckBox;
     private FlowLayoutPanel buttonsPanel;
     private Button saveButton;
     private Button cancelButton;

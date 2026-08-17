@@ -38,6 +38,7 @@ partial class MainForm
         profilePromptLabel = new Label();
         profileComboBox = new ComboBox();
         profilesButton = new Button();
+        qrCheckBox = new CheckBox();
         numberingGroupBox = new GroupBox();
         numberingLayoutPanel = new TableLayoutPanel();
         firstNumberPromptLabel = new Label();
@@ -233,11 +234,14 @@ partial class MainForm
         printingLayoutPanel.Controls.Add(profilePromptLabel, 0, 1);
         printingLayoutPanel.Controls.Add(profileComboBox, 1, 1);
         printingLayoutPanel.Controls.Add(profilesButton, 2, 1);
+        printingLayoutPanel.Controls.Add(qrCheckBox, 1, 2);
+        printingLayoutPanel.SetColumnSpan(qrCheckBox, 2);
         printingLayoutPanel.AutoSize = true;
         printingLayoutPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
         printingLayoutPanel.Dock = DockStyle.Top;
         printingLayoutPanel.Name = "printingLayoutPanel";
-        printingLayoutPanel.RowCount = 2;
+        printingLayoutPanel.RowCount = 3;
+        printingLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         printingLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         printingLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         printingLayoutPanel.TabIndex = 0;
@@ -283,6 +287,15 @@ partial class MainForm
         profilesButton.TabIndex = 4;
         profilesButton.Text = "Profile...";
         profilesButton.UseVisualStyleBackColor = true;
+        //
+        // qrCheckBox
+        //
+        qrCheckBox.Anchor = AnchorStyles.Left;
+        qrCheckBox.AutoSize = true;
+        qrCheckBox.Name = "qrCheckBox";
+        qrCheckBox.TabIndex = 5;
+        qrCheckBox.Text = "QR z Asset ID";
+        qrCheckBox.UseVisualStyleBackColor = true;
         //
         // numberingGroupBox
         //
@@ -570,6 +583,7 @@ partial class MainForm
     private Label profilePromptLabel;
     private ComboBox profileComboBox;
     private Button profilesButton;
+    private CheckBox qrCheckBox;
     private GroupBox numberingGroupBox;
     private TableLayoutPanel numberingLayoutPanel;
     private Label firstNumberPromptLabel;

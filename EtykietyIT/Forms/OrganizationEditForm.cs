@@ -50,6 +50,7 @@ public partial class OrganizationEditForm : Form
         }
 
         SelectPrinter(profile.DefaultPrinterName);
+        defaultQrCheckBox.Checked = profile.DefaultQrEnabled;
 
         saveButton.Click += SaveButton_Click;
         cancelButton.Click += CancelButton_Click;
@@ -143,7 +144,8 @@ public partial class OrganizationEditForm : Form
             NextAssetNumber = decimal.ToInt32(
                 nextAssetNumberNumericUpDown.Value),
             DefaultLabelProfileId = labelProfile.Id,
-            DefaultPrinterName = defaultPrinterName
+            DefaultPrinterName = defaultPrinterName,
+            DefaultQrEnabled = defaultQrCheckBox.Checked
         };
 
         try

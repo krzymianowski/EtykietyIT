@@ -29,6 +29,7 @@ partial class ProfileEditForm
         rowsLabel = new Label();
         rowsNumericUpDown = new NumericUpDown();
         drawCutLinesCheckBox = new CheckBox();
+        cellSizeLabel = new Label();
         buttonsPanel = new FlowLayoutPanel();
         saveButton = new Button();
         cancelButton = new Button();
@@ -56,11 +57,14 @@ partial class ProfileEditForm
         mainLayoutPanel.Controls.Add(rowsLabel, 0, 4);
         mainLayoutPanel.Controls.Add(rowsNumericUpDown, 1, 4);
         mainLayoutPanel.Controls.Add(drawCutLinesCheckBox, 1, 5);
-        mainLayoutPanel.Controls.Add(buttonsPanel, 0, 7);
+        mainLayoutPanel.Controls.Add(cellSizeLabel, 0, 6);
+        mainLayoutPanel.SetColumnSpan(cellSizeLabel, 2);
+        mainLayoutPanel.Controls.Add(buttonsPanel, 0, 8);
         mainLayoutPanel.SetColumnSpan(buttonsPanel, 2);
         mainLayoutPanel.Dock = DockStyle.Fill;
         mainLayoutPanel.Padding = new Padding(20);
-        mainLayoutPanel.RowCount = 8;
+        mainLayoutPanel.RowCount = 9;
+        mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -155,6 +159,15 @@ partial class ProfileEditForm
         drawCutLinesCheckBox.Text = "Linie cięcia";
         drawCutLinesCheckBox.UseVisualStyleBackColor = true;
         //
+        // cellSizeLabel
+        //
+        cellSizeLabel.Anchor = AnchorStyles.Left;
+        cellSizeLabel.AutoSize = true;
+        cellSizeLabel.Margin = new Padding(0, 4, 0, 10);
+        cellSizeLabel.Name = "cellSizeLabel";
+        cellSizeLabel.TabIndex = 6;
+        cellSizeLabel.Text = "Rozmiar pojedynczej etykiety: —";
+        //
         // buttonsPanel
         //
         buttonsPanel.AutoSize = true;
@@ -226,6 +239,7 @@ partial class ProfileEditForm
     private Label rowsLabel;
     private NumericUpDown rowsNumericUpDown;
     private CheckBox drawCutLinesCheckBox;
+    private Label cellSizeLabel;
     private FlowLayoutPanel buttonsPanel;
     private Button saveButton;
     private Button cancelButton;

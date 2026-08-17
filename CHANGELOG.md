@@ -11,4 +11,10 @@
 - wyszukiwanie i filtrowanie historii,
 - eksport historii do CSV,
 - eksport historii do XLSX,
+- opcjonalny QR z dokładnie sformatowanym Asset ID,
+- domyślne ustawienie QR osobne dla każdego profilu organizacji,
+- dynamiczne dopasowanie QR do komórki, z minimum 4 dots/module,
+- preflight drukowalności zależny od sterownika, geometrii i aktualnej treści,
+  blokujący przewidywalne kolizje przed podglądem i drukiem,
+- fizyczna walidacja QR i preflightu na DYMO LabelWriter 450 i 550,
 - tryby przechowywania danych Standard i Portable.

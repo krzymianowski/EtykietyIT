@@ -48,6 +48,54 @@ public sealed class OrganizationProfileServiceTests
     }
 
     [TestMethod]
+    public async Task UpdateAsync_RoundTripsDefaultQrEnabled()
+    {
+        await WithServiceAsync(async (service, _) =>
+        {
+            OrganizationProfile created = await service.CreateAsync(
+                CreateProfile("Organizacja QR", 10));
+
+            await service.UpdateAsync(created with { DefaultQrEnabled = true });
+            OrganizationProfile loaded =
+                (await service.GetByIdAsync(created.Id))!;
+
+            Assert.IsTrue(loaded.DefaultQrEnabled);
+        });
+    }
+
+    [TestMethod]
+    public async Task GetAllAsync_OldJsonWithoutQrFieldDefaultsToFalse()
+    {
+        await WithServiceAsync(async (service, directoryPath) =>
+        {
+            string id = $"organization.{Guid.NewGuid():D}";
+            string json = $$"""
+                {
+                  "schemaVersion": 1,
+                  "id": "{{id}}",
+                  "name": "Stara organizacja",
+                  "companyName": "Stara firma",
+                  "assetId": {
+                    "prefix": "IT-",
+                    "digits": 6
+                  },
+                  "nextAssetNumber": 1,
+                  "defaultLabelProfileId": "builtin.89x41.2up",
+                  "defaultPrinterName": null
+                }
+                """;
+            await File.WriteAllTextAsync(
+                Path.Combine(directoryPath, $"{id}.json"),
+                json);
+
+            OrganizationProfileReadResult result = await service.GetAllAsync();
+
+            Assert.HasCount(1, result.Profiles);
+            Assert.IsFalse(result.Profiles[0].DefaultQrEnabled);
+        });
+    }
+
+    [TestMethod]
     public async Task DuplicateAsync_CreatesIndependentProfileWithNewId()
     {
         await WithServiceAsync(async (service, _) =>

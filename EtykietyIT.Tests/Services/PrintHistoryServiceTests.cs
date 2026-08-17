@@ -192,6 +192,27 @@ public sealed class PrintHistoryServiceTests
     }
 
     [TestMethod]
+    public async Task AppendAsync_RoundTripsQrEnabledSnapshot()
+    {
+        await WithHistoryFileAsync(async (service, _) =>
+        {
+            PrintHistoryEntry original = CreateEntry(1, 1);
+            PrintHistoryEntry entry = original with
+            {
+                Snapshot = original.Snapshot with { QrEnabled = true }
+            };
+
+            await service.AppendAsync(entry);
+            PrintHistorySnapshot snapshot = (await service.ReadAllAsync())
+                .Entries
+                .Single()
+                .Snapshot;
+
+            Assert.IsTrue(snapshot.QrEnabled);
+        });
+    }
+
+    [TestMethod]
     public async Task ReadAllAsync_ReadsLegacyLineWithoutOrganizationFields()
     {
         await WithHistoryFileAsync(async (service, filePath) =>

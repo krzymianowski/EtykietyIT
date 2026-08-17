@@ -3,7 +3,8 @@ namespace EtykietyIT.Printing;
 public sealed record LabelContentOptions(
     string CompanyName,
     string AssetIdPrefix,
-    int AssetIdDigits)
+    int AssetIdDigits,
+    bool QrEnabled = false)
 {
     public void Validate()
     {

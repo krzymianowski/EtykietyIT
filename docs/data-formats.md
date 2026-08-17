@@ -43,12 +43,15 @@ organizations/organization.<guid>.json
   },
   "nextAssetNumber": 24,
   "defaultLabelProfileId": "builtin.89x41.2up",
-  "defaultPrinterName": "DYMO LabelWriter 550"
+  "defaultPrinterName": "DYMO LabelWriter 550",
+  "defaultQrEnabled": false
 }
 ```
 
 Nazwy organizacji są unikalne bez rozróżniania wielkości liter. Kalibracje
-drukarek nie są częścią tego dokumentu.
+drukarek nie są częścią tego dokumentu. `defaultQrEnabled` określa domyślne
+ustawienie UI organizacji. Brak tego addytywnego pola w starszym pliku oznacza
+`false` i nie wymaga migracji.
 
 ## Kalibracje drukarek
 
@@ -130,7 +133,9 @@ Snapshot zachowuje m.in. drukarkę, kalibrację, firmę, format Asset ID, zakres
 profil wraz z geometrią oraz liczbę małych i fizycznych etykiet. Nowe wpisy
 zawierają także `organizationProfileId` i `organizationProfileName`. Pola te są
 opcjonalne przy odczycie, aby wpisy zapisane przed wprowadzeniem organizacji
-pozostały poprawne. Historia nie jest migrowana ani przepisywana.
+pozostały poprawne. Pole `qrEnabled` zapisuje faktyczne ustawienie zadania;
+brak tego pola w starszym wpisie oznacza `false`. Historia nie jest migrowana
+ani przepisywana.
 
 ## Eksport CSV historii
 

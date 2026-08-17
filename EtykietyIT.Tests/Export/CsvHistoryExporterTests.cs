@@ -78,6 +78,24 @@ public sealed class CsvHistoryExporterTests
     }
 
     [TestMethod]
+    public async Task ExportAsync_WritesQrEnabledAsTak()
+    {
+        await WithExportFileAsync(async filePath =>
+        {
+            PrintHistoryEntry original = CreateEntry(123, 1);
+            PrintHistoryEntry entry = original with
+            {
+                Snapshot = original.Snapshot with { QrEnabled = true }
+            };
+
+            await new CsvHistoryExporter().ExportAsync(new[] { entry }, filePath);
+            string[] values = ParseRow(ReadLines(filePath)[1]);
+
+            Assert.AreEqual("Tak", values[25]);
+        });
+    }
+
+    [TestMethod]
     public async Task ExportAsync_WritesOrganizationInformation()
     {
         await WithExportFileAsync(async filePath =>

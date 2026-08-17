@@ -108,6 +108,24 @@ public sealed class XlsxHistoryExporterTests
     }
 
     [TestMethod]
+    public async Task ExportAsync_WritesQrEnabledAsTak()
+    {
+        await WithExportFileAsync(async filePath =>
+        {
+            PrintHistoryEntry original = CreateEntry(123, 1);
+            PrintHistoryEntry entry = original with
+            {
+                Snapshot = original.Snapshot with { QrEnabled = true }
+            };
+
+            await new XlsxHistoryExporter().ExportAsync(new[] { entry }, filePath);
+
+            using SpreadsheetDocument document = OpenWorkbook(filePath);
+            Assert.AreEqual("Tak", ReadCellText(document, "Z2"));
+        });
+    }
+
+    [TestMethod]
     public async Task ExportAsync_WritesMultipleEntriesInInputOrder()
     {
         await WithExportFileAsync(async filePath =>

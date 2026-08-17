@@ -1,4 +1,5 @@
 using System.Drawing.Printing;
+using System.Text;
 using EtykietyIT.Export;
 using EtykietyIT.Forms;
 using EtykietyIT.Models;
@@ -17,6 +18,7 @@ public partial class MainForm : Form
     private readonly ApplicationVersionService _applicationVersionService;
     private readonly IHistoryExporter _csvHistoryExporter;
     private readonly IHistoryExporter _xlsxHistoryExporter;
+    private readonly LabelPrintabilityValidator _printabilityValidator = new();
 
     private ApplicationSettings _settings;
     private OrganizationProfile? _activeOrganization;
@@ -383,15 +385,25 @@ public partial class MainForm : Form
         }
 
         PrinterCalibration calibration = GetPrinterCalibration();
+        bool qrEnabled = qrCheckBox.Checked;
 
         try
         {
-            using var printJob = CreatePrintJob(
+            LabelPrintOptions options = CreatePrintOptions(
                 printerName,
                 startNumber,
                 quantity,
                 calibration,
-                LabelRenderMode.Preview);
+                LabelRenderMode.Preview,
+                qrEnabled);
+            LabelPrintabilityResult preflight =
+                _printabilityValidator.Validate(options);
+            if (!EnsurePrintable(preflight, printerName, GetSelectedProfile()))
+            {
+                return;
+            }
+
+            using var printJob = new LabelPrintJob(options);
             using var previewDialog = new PrintPreviewDialog
             {
                 Document = printJob.Document,
@@ -429,15 +441,42 @@ public partial class MainForm : Form
         LabelProfile profile = GetSelectedProfile();
         int slotsPerPhysicalLabel = profile.Columns * profile.Rows;
         PrinterCalibration calibration = GetPrinterCalibration();
+        bool qrEnabled = qrCheckBox.Checked;
         int physicalLabels = (int)Math.Ceiling(
             quantity / (double)slotsPerPhysicalLabel);
+
+        LabelPrintOptions printOptions = CreatePrintOptions(
+            printerName,
+            startNumber,
+            quantity,
+            calibration,
+            LabelRenderMode.Print,
+            qrEnabled);
+        LabelPrintabilityResult preflight;
+        try
+        {
+            preflight = _printabilityValidator.Validate(printOptions);
+        }
+        catch (Exception exception)
+        {
+            ShowError(
+                "Nie udało się sprawdzić drukowalności etykiet." +
+                $"\r\n\r\n{exception.Message}");
+            return;
+        }
+
+        if (!EnsurePrintable(preflight, printerName, profile))
+        {
+            return;
+        }
 
         string confirmation =
             $"Organizacja: {organization.Name}\r\n" +
             $"Drukarka: {printerName}\r\n" +
             $"Zakres: {FormatAssetId(startNumber)} – {FormatAssetId(endNumber)}\r\n" +
             $"Małych etykiet: {quantity}\r\n" +
-            $"Fizycznych etykiet: {physicalLabels}\r\n\r\n" +
+            $"Fizycznych etykiet: {physicalLabels}\r\n" +
+            $"QR z Asset ID: {(qrEnabled ? "Tak" : "Nie")}\r\n\r\n" +
             "Wysłać do drukarki?";
 
         DialogResult answer = MessageBox.Show(
@@ -454,12 +493,7 @@ public partial class MainForm : Form
 
         try
         {
-            using var printJob = CreatePrintJob(
-                printerName,
-                startNumber,
-                quantity,
-                calibration,
-                LabelRenderMode.Print);
+            using var printJob = new LabelPrintJob(printOptions);
             printJob.Document.Print();
         }
         catch (Exception exception)
@@ -496,7 +530,7 @@ public partial class MainForm : Form
                 DrawCutLines = profile.DrawCutLines,
                 SmallLabelQuantity = quantity,
                 PhysicalLabelQuantity = physicalLabels,
-                QrEnabled = false
+                QrEnabled = qrEnabled
             }
         };
 
@@ -540,20 +574,22 @@ public partial class MainForm : Form
         }
     }
 
-    private LabelPrintJob CreatePrintJob(
+    private LabelPrintOptions CreatePrintOptions(
         string printerName,
         int startNumber,
         int quantity,
         PrinterCalibration calibration,
-        LabelRenderMode renderMode)
+        LabelRenderMode renderMode,
+        bool qrEnabled)
     {
         OrganizationProfile organization = GetActiveOrganization();
         LabelProfile profile = GetSelectedProfile();
         var content = new LabelContentOptions(
             organization.CompanyName,
             organization.AssetId.Prefix,
-            organization.AssetId.Digits);
-        var options = new LabelPrintOptions(
+            organization.AssetId.Digits,
+            qrEnabled);
+        return new LabelPrintOptions(
             printerName,
             startNumber,
             quantity,
@@ -565,8 +601,6 @@ public partial class MainForm : Form
             content,
             calibration,
             renderMode);
-
-        return new LabelPrintJob(options);
     }
 
     private async Task ReloadOrganizationsAsync(string preferredOrganizationId)
@@ -635,6 +669,7 @@ public partial class MainForm : Form
         try
         {
             firstNumberNumericUpDown.Value = organization.NextAssetNumber;
+            qrCheckBox.Checked = organization.DefaultQrEnabled;
             await ReloadLabelProfilesAsync(
                 organization.DefaultLabelProfileId);
             SelectPreferredPrinter(organization.DefaultPrinterName);
@@ -834,5 +869,65 @@ public partial class MainForm : Form
             "Etykiety IT",
             MessageBoxButtons.OK,
             MessageBoxIcon.Error);
+    }
+
+    private bool EnsurePrintable(
+        LabelPrintabilityResult result,
+        string printerName,
+        LabelProfile profile)
+    {
+        if (result.IsPrintable)
+        {
+            return true;
+        }
+
+        LabelPrintabilityIssue[] errors = result.Issues
+            .Where(issue => issue.Severity == LabelPrintabilitySeverity.Error)
+            .ToArray();
+        var message = new StringBuilder()
+            .AppendLine("Nie można przygotować etykiet dla wybranego profilu.")
+            .AppendLine()
+            .AppendLine("Drukarka:")
+            .AppendLine(printerName)
+            .AppendLine()
+            .AppendLine("Profil:")
+            .AppendLine(
+                $"{profile.Name} — {profile.WidthMm:0.#} × " +
+                $"{profile.HeightMm:0.#} mm — " +
+                $"{profile.Columns} × {profile.Rows}")
+            .AppendLine()
+            .AppendLine("Rozmiar pojedynczej etykiety:")
+            .AppendLine(
+                $"{result.CellWidthMm:0.0} × {result.CellHeightMm:0.0} mm")
+            .AppendLine()
+            .AppendLine("Problemy:");
+
+        foreach (LabelPrintabilityIssue issue in errors)
+        {
+            message.Append("• ").AppendLine(issue.Message);
+        }
+
+        message.AppendLine().AppendLine("Spróbuj:");
+        message.AppendLine("• zmniejszyć liczbę wierszy lub kolumn,");
+        message.AppendLine("• wybrać większy profil etykiety,");
+
+        bool hasQrIssue = errors.Any(issue =>
+            issue.Code.StartsWith("QR_", StringComparison.Ordinal));
+        if (hasQrIssue)
+        {
+            message.AppendLine("• wyłączyć QR,");
+        }
+
+        bool hasTextIssue = errors.Any(issue =>
+            issue.Code.StartsWith("TITLE_", StringComparison.Ordinal) ||
+            issue.Code.StartsWith("ASSET_ID_", StringComparison.Ordinal) ||
+            issue.Code.StartsWith("COMPANY_", StringComparison.Ordinal));
+        if (hasTextIssue)
+        {
+            message.AppendLine("• skrócić nazwę firmy lub prefiks Asset ID.");
+        }
+
+        ShowError(message.ToString().TrimEnd());
+        return false;
     }
 }

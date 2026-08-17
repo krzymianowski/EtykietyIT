@@ -13,6 +13,10 @@ inwentarzowych dla urządzeń i zasobów IT.
 - obsługa drukarek dostępnych w systemie Windows,
 - osobna kalibracja X/Y dla każdej drukarki,
 - podgląd przed wydrukiem,
+- opcjonalny QR zawierający dokładnie sformatowany Asset ID, z dynamicznym
+  dopasowaniem wielkości i minimum 4 dots/module,
+- preflight blokujący podgląd i druk nieczytelnych kombinacji profilu,
+  drukarki i treści,
 - trwała historia przekazanych zadań drukowania,
 - wyszukiwanie i filtrowanie historii,
 - eksport widocznych rekordów do CSV i XLSX,
@@ -31,6 +35,10 @@ wyłącznie do urządzeń DYMO. Fizyczne testy geometrii i kalibracji wykonano n
 - DYMO LabelWriter 550.
 
 Szczegóły testów sprzętowych znajdują się w
+[`docs/printing-validation.md`](docs/printing-validation.md).
+Obsługa QR i preflight zostały fizycznie zweryfikowane na DYMO LabelWriter 450
+i DYMO LabelWriter 550, w tym dla układu 2 × 2 / 4 małe etykiety. Szczegóły
+opisują [`docs/qr.md`](docs/qr.md) i
 [`docs/printing-validation.md`](docs/printing-validation.md).
 
 ## Dane aplikacji
